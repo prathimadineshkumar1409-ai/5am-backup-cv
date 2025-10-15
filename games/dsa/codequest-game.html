@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeQuest: The Lost Data Realms</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        
+        .game-header h1 {
+            font-size: 36px;
+            margin: 0;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        .game-header p {
+            font-size: 16px;
+            color: #a0a0a0;
+            margin: 10px 0 0 0;
+        }
+        
+        #game-container {
+            border: 3px solid #00ff88;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            overflow: hidden;
+        }
+        
+        .game-info {
+            margin-top: 20px;
+            text-align: center;
+            max-width: 800px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .game-info h2 {
+            color: #00ff88;
+            margin-top: 0;
+        }
+        
+        .game-info ul {
+            text-align: left;
+            line-height: 1.8;
+        }
+        
+        .controls {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .controls h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-header">
+        <h1>🎮 CodeQuest: The Lost Data Realms</h1>
+        <p>An Educational DSA Adventure Game</p>
+    </div>
+    
+    <div id="game-container"></div>
+    
+    <div class="game-info">
+        <h2>📚 Game Overview</h2>
+        <p>Journey through 5 levels to restore the corrupted Digital Realm by mastering Data Structures!</p>
+        
+        <div class="controls">
+            <h3>🎯 Levels:</h3>
+            <ul>
+                <li><strong>Level 1:</strong> Digital Awakening - Introduction to your quest</li>
+                <li><strong>Level 2:</strong> Array Realm - Drag and drop elements to sort an array</li>
+                <li><strong>Level 3:</strong> Stack Summit - Learn LIFO with push/pop operations</li>
+                <li><strong>Level 4:</strong> Queue Quarters - Master FIFO with enqueue/dequeue</li>
+                <li><strong>Level 5:</strong> Core Simulator - Combine all concepts + victory animation!</li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            <h3>🎮 Controls:</h3>
+            <ul>
+                <li><strong>Mouse:</strong> Click buttons and drag elements</li>
+                <li><strong>Level 2:</strong> Drag numbers to sort them in ascending order</li>
+                <li><strong>Level 3:</strong> Click PUSH to add crates, POP to remove them</li>
+                <li><strong>Level 4:</strong> Click ENQUEUE to add passengers, DEQUEUE to remove</li>
+                <li><strong>Level 5:</strong> Complete all three mini-tasks to win!</li>
+            </ul>
+        </div>
+        
+        <p class="pulse" style="margin-top: 20px; color: #ffd700;">
+            ⭐ Collect all 3 Data Keys to restore the Digital Realm! ⭐
+        </p>
+    </div>
+
+    <!-- Phaser.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <!-- Game Code -->
+    <script src="codequest-lost-data-realms.js"></script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+{
+  "topics": {
+    "os": {
+      "name": "Operating Systems",
+      "icon": "💻",
+      "color": "#3b82f6",
+      "subtopics": [
+        {
+          "id": "process-scheduling",
+          "name": "Process Scheduling",
+          "difficulty": "beginner",
+          "description": "Learn CPU scheduling algorithms: FCFS, SJF, Round Robin",
+          "gameFile": "games/os/process-scheduler.js",
+          "videoBasic": "https://www.youtube.com/watch?v=2h3eWaPx8SA",
+          "videoAdvanced": "https://www.youtube.com/watch?v=EWkQl0n0w5M"
+        },
+        {
+          "id": "memory-management",
+          "name": "Memory Management",
+          "difficulty": "intermediate",
+          "description": "Master paging, segmentation, and virtual memory",
+          "gameFile": "games/os/memory-manager.js",
+          "videoBasic": "https://www.youtube.com/watch?v=qdkxXygc3rE",
+          "videoAdvanced": "https://www.youtube.com/watch?v=2quKyPnUShQ"
+        },
+        {
+          "id": "deadlock",
+          "name": "Deadlock Detection",
+          "difficulty": "advanced",
+          "description": "Understand deadlock conditions and prevention strategies",
+          "gameFile": "games/os/deadlock-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=UVo9mGARkhQ",
+          "videoAdvanced": "https://www.youtube.com/watch?v=onkWXaXAgbY"
+        },
+        {
+          "id": "file-systems",
+          "name": "File Systems",
+          "difficulty": "intermediate",
+          "description": "Explore file allocation methods and directory structures",
+          "gameFile": "games/os/file-system.js",
+          "videoBasic": "https://www.youtube.com/watch?v=KN8YgJnShPM",
+          "videoAdvanced": "https://www.youtube.com/watch?v=mzUyMy7Ihk0"
+        }
+      ]
+    },
+    "networks": {
+      "name": "Computer Networks",
+      "icon": "🌐",
+      "color": "#10b981",
+      "subtopics": [
+        {
+          "id": "tcp-ip",
+          "name": "TCP/IP Protocol",
+          "difficulty": "beginner",
+          "description": "Simulate packet routing and TCP handshake",
+          "gameFile": "games/networks/tcp-simulation.js",
+          "videoBasic": "https://www.youtube.com/watch?v=PpsEaqJV_A0",
+          "videoAdvanced": "https://www.youtube.com/watch?v=nomyRJehhnM"
+        },
+        {
+          "id": "dns",
+          "name": "DNS Resolution",
+          "difficulty": "beginner",
+          "description": "Learn how domain names are resolved to IP addresses",
+          "gameFile": "games/networks/dns-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=mpQZVYPuDGU",
+          "videoAdvanced": "https://www.youtube.com/watch?v=uOfonONtIuk"
+        },
+        {
+          "id": "routing",
+          "name": "Network Routing",
+          "difficulty": "intermediate",
+          "description": "Master routing algorithms and protocols",
+          "gameFile": "games/networks/routing-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=AkxqkoxErRk",
+          "videoAdvanced": "https://www.youtube.com/watch?v=rL8RSFQG8do"
+        }
+      ]
+    },
+    "cybersec": {
+      "name": "Cyber Security",
+      "icon": "🔒",
+      "color": "#ef4444",
+      "subtopics": [
+        {
+          "id": "encryption",
+          "name": "Encryption Basics",
+          "difficulty": "beginner",
+          "description": "Learn Caesar cipher, substitution, and basic cryptography",
+          "gameFile": "games/cybersec/encryption-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=jhXCTbFnK8o",
+          "videoAdvanced": "https://www.youtube.com/watch?v=NuyzuNBFWxQ"
+        },
+        {
+          "id": "sql-injection",
+          "name": "SQL Injection",
+          "difficulty": "intermediate",
+          "description": "Understand and prevent SQL injection attacks",
+          "gameFile": "games/cybersec/sql-injection.js",
+          "videoBasic": "https://www.youtube.com/watch?v=_jKylhJtPmI",
+          "videoAdvanced": "https://www.youtube.com/watch?v=ciNHn38EyRc"
+        },
+        {
+          "id": "password-security",
+          "name": "Password Security",
+          "difficulty": "beginner",
+          "description": "Learn password hashing and security best practices",
+          "gameFile": "games/cybersec/password-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=8ZtInClXe1Q",
+          "videoAdvanced": "https://www.youtube.com/watch?v=7U-RbOKanYs"
+        }
+      ]
+    },
+    "dsa": {
+      "name": "Data Structures & Algorithms",
+      "icon": "🧮",
+      "color": "#8b5cf6",
+      "subtopics": [
+        {
+          "id": "stack",
+          "name": "Stack (LIFO)",
+          "difficulty": "beginner",
+          "description": "Master the Last-In-First-Out data structure",
+          "gameFile": "games/dsa/stack-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=F1F2imiOJfk",
+          "videoAdvanced": "https://www.youtube.com/watch?v=RBSGKlAvoiM"
+        },
+        {
+          "id": "queue",
+          "name": "Queue (FIFO)",
+          "difficulty": "beginner",
+          "description": "Learn First-In-First-Out operations",
+          "gameFile": "games/dsa/queue-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=XuCbpw6Bj1U",
+          "videoAdvanced": "https://www.youtube.com/watch?v=okr-XE8yTO8"
+        },
+        {
+          "id": "binary-tree",
+          "name": "Binary Trees",
+          "difficulty": "intermediate",
+          "description": "Explore tree traversal and operations",
+          "gameFile": "games/dsa/tree-game.js",
+          "videoBasic": "https://www.youtube.com/watch?v=H5JubkIy_p8",
+          "videoAdvanced": "https://www.youtube.com/watch?v=fAAZixBzIAI"
+        }
+      ]
+    },
+    "interview": {
+      "name": "Interview Preparation",
+      "icon": "💼",
+      "color": "#f59e0b",
+      "subtopics": [
+        {
+          "id": "coding-challenges",
+          "name": "Coding Challenges",
+          "difficulty": "mixed",
+          "description": "Practice common interview coding problems",
+          "gameFile": "games/interview/coding-challenge.js",
+          "videoBasic": "https://www.youtube.com/watch?v=GBuHSRDGZBY",
+          "videoAdvanced": "https://www.youtube.com/watch?v=8wysIxzqgPI"
+        },
+        {
+          "id": "system-design",
+          "name": "System Design",
+          "difficulty": "advanced",
+          "description": "Learn to design scalable systems",
+          "gameFile": "games/interview/system-design.js",
+          "videoBasic": "https://www.youtube.com/watch?v=UzLMhqg3_Wc",
+          "videoAdvanced": "https://www.youtube.com/watch?v=bUHFg8CZFws"
+        }
+      ]
+    }
+  },
+  "certifications": {
+    "os": [
+      {
+        "name": "CompTIA Linux+",
+        "provider": "CompTIA",
+        "url": "https://www.comptia.org/certifications/linux"
+      },
+      {
+        "name": "Red Hat Certified System Administrator",
+        "provider": "Red Hat",
+        "url": "https://www.redhat.com/en/services/certification/rhcsa"
+      }
+    ],
+    "networks": [
+      {
+        "name": "Cisco CCNA",
+        "provider": "Cisco",
+        "url": "https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html"
+      },
+      {
+        "name": "CompTIA Network+",
+        "provider": "CompTIA",
+        "url": "https://www.comptia.org/certifications/network"
+      }
+    ],
+    "cybersec": [
+      {
+        "name": "CompTIA Security+",
+        "provider": "CompTIA",
+        "url": "https://www.comptia.org/certifications/security"
+      },
+      {
+        "name": "Certified Ethical Hacker (CEH)",
+        "provider": "EC-Council",
+        "url": "https://www.eccouncil.org/programs/certified-ethical-hacker-ceh/"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1280 @@
+{
+  "courses": {
+    "dsa": {
+      "name": "Data Structures & Algorithms",
+      "icon": "🧮",
+      "levels": [
+        {
+          "id": 1,
+          "title": "Introduction to DSA",
+          "description": "A foundational overview of Data Structures and Algorithms, introducing key concepts and their importance.",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/xLetJpcjHS0?si=pPe57J31Zq4NQC61",
+          "concepts": [
+            {
+              "title": "What are Data Structures?",
+              "content": "Data Structures are ways of organizing and storing data in a computer so that it can be used efficiently. They define the relationship between the data and the operations that can be performed on the data. Choosing the right data structure can significantly impact the performance of an algorithm.",
+              "example": "// Example: Array\n// An array is a linear data structure that stores elements of the same type in contiguous memory locations.\nlet myArray = [1, 2, 3, 4, 5];"
+            },
+            {
+              "title": "What are Algorithms?",
+              "content": "Algorithms are a set of well-defined instructions to solve a particular problem. They provide a step-by-step procedure to transform input data into the desired output. Algorithms are crucial for efficient problem-solving in computer science, determining how quickly and effectively a task can be accomplished.",
+              "example": "// Example: Linear Search Algorithm (Pseudocode)\n// Input: Array 'arr', Target value 'target'\n// Output: Index of 'target' in 'arr', or -1 if not found\n// For each element in 'arr':\n//   If element equals 'target':\n//     Return the index of the element\n// Return -1"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Which of the following is NOT a Data Structure?",
+                "options": [
+                  "Array",
+                  "Linked List",
+                  "Compiler",
+                  "Tree"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "What is the main purpose of using Data Structures?",
+                "options": [
+                  "To write code faster",
+                  "To organize and store data efficiently",
+                  "To make the program look good",
+                  "To confuse other programmers"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is an algorithm?",
+                "options": [
+                  "A type of computer hardware",
+                  "A step-by-step procedure to solve a problem",
+                  "A programming language",
+                  "A database management system"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which of the following is a key characteristic of an efficient algorithm?",
+                "options": [
+                  "Uses a lot of memory",
+                  "Takes a long time to execute",
+                  "Solves the problem correctly and quickly",
+                  "Is difficult to understand"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Which of the following is an example of a linear data structure?",
+                "options": [
+                  "Tree",
+                  "Graph",
+                  "Array",
+                  "Heap"
+                ],
+                "correct": 2
+              }
+            ]
+          },
+          "coding": {
+            "title": "Find the Maximum Element",
+            "description": "Implement a function that takes an array of numbers as input and returns the largest number in the array.",
+            "starterCode": "// Given an array of numbers, find the maximum element.\nfunction findMaximum(arr) {\n  // Your code here\n  if (arr.length === 0) {\n    return undefined; // Handle empty array case\n  }\n\n  let max = arr[0];\n  for (let i = 1; i < arr.length; i++) {\n    if (arr[i] > max) {\n      max = arr[i];\n    }\n  }\n  return max;\n}"
+          }
+        },
+        {
+          "id": 2,
+          "title": "Arrays",
+          "description": "Arrays provide direct access to elements using their index, which is a numerical representation of t...",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/55l-aZ7_F24?si=GX_p_n5d0krVuOvy",
+          "concepts": [
+            {
+              "title": "Array Access and Modification",
+              "content": "Arrays provide direct access to elements using their index, which is a numerical representation of the element's position within the array. This allows for efficient retrieval and modification of elements in constant time, O(1), given the index. Understanding how to access and modify elements is crucial for performing various array operations and algorithms. Incorrect index access can lead to errors such as 'Index out of bounds'.",
+              "example": "// JavaScript example demonstrating array access and modification\nfunction accessAndModify(arr, index, newValue) {\n  // Access the element at the given index\n  const originalValue = arr[index];\n  console.log(\"Original value at index \" + index + \": \" + originalValue);\n\n  // Modify the element at the given index\n  arr[index] = newValue;\n  console.log(\"New value at index \" + index + \": \" + arr[index]);\n\n  return arr;\n}\n\n// Example usage\nconst myArray = [10, 20, 30, 40, 50];\nconst modifiedArray = accessAndModify(myArray, 2, 35);\nconsole.log(\"Modified array: \", modifiedArray); // Output: [10, 20, 35, 40, 50]"
+            },
+            {
+              "title": "Array Iteration and Traversal",
+              "content": "Iterating through an array allows you to process each element sequentially. This is essential for tasks like searching, filtering, and applying transformations to the elements. Common methods for iteration include using `for` loops, `while` loops, and array-specific methods like `forEach`, `map`, and `filter`. Choosing the right iteration method depends on the specific task and desired level of control.",
+              "example": "// JavaScript example demonstrating array iteration using forEach\nfunction iterateAndPrint(arr) {\n  // Iterate through the array using forEach\n  arr.forEach(function(element, index) {\n    console.log(\"Element at index \" + index + \": \" + element);\n  });\n}\n\n// Example usage\nconst myArray = [\"apple\", \"banana\", \"cherry\"];\niterateAndPrint(myArray); // Output: Element at index 0: apple, Element at index 1: banana, Element at index 2: cherry\n\n// Example using a for loop\nfunction iterateAndDouble(arr) {\n    for (let i = 0; i < arr.length; i++) {\n        arr[i] = arr[i] * 2;\n    }\n    return arr;\n}\n\nconst numbers = [1, 2, 3];\nconst doubledNumbers = iterateAndDouble(numbers);\nconsole.log(doubledNumbers); // Output: [2, 4, 6]"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What is the time complexity of accessing an element in an array given its index?",
+                "options": [
+                  "O(n)",
+                  "O(log n)",
+                  "O(1)",
+                  "O(n^2)"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Which of the following is NOT a valid way to iterate through an array in JavaScript?",
+                "options": [
+                  "for loop",
+                  "while loop",
+                  "forEach method",
+                  "reduce method"
+                ],
+                "correct": 3
+              },
+              {
+                "question": "Which array method is best suited for creating a new array by applying a function to each element of an existing array?",
+                "options": [
+                  "filter",
+                  "forEach",
+                  "map",
+                  "reduce"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "What happens if you try to access an array element using an index that is out of bounds in JavaScript?",
+                "options": [
+                  "The program crashes.",
+                  "It returns null.",
+                  "It throws an error.",
+                  "It returns the first element."
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Which data structure is typically used as the underlying implementation for arrays in most programming languages?",
+                "options": [
+                  "Contiguous memory block",
+                  "Linked list",
+                  "Hash table",
+                  "Binary tree"
+                ],
+                "correct": 0
+              }
+            ]
+          },
+          "coding": {
+            "title": "Reverse an Array In-Place",
+            "description": "Given an array of integers, reverse the order of the elements in-place.  You must modify the original array directly. Do not create a new array. The input array will always have at least one element.",
+            "starterCode": "// Given an array of integers, reverse the order of the elements in-place.\nfunction solution(arr) {\n  // Your code here\n  // TODO: Implement the in-place array reversal\n\n  let left = 0;\n  let right = arr.length - 1;\n\n  while (left < right) {\n    // Swap elements at left and right indices\n    [arr[left], arr[right]] = [arr[right], arr[left]];\n\n    // Move indices towards the middle\n    left++;\n    right--;\n  }\n\n  return arr;\n}"
+          }
+        },
+        {
+          "id": 3,
+          "title": "Linked Lists",
+          "description": "A linked list is a linear data structure where elements are stored in nodes. Each node contains data...",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/R9PTBwOzceo?si=Y3lVz6Rh-8JTBKYG",
+          "concepts": [
+            {
+              "title": "Understanding Linked List Structure",
+              "content": "A linked list is a linear data structure where elements are stored in nodes. Each node contains data and a pointer (or reference) to the next node in the sequence. Unlike arrays, linked lists do not store elements in contiguous memory locations, offering flexibility in terms of dynamic memory allocation. This structure allows for efficient insertion and deletion of elements at any position in the list, as only pointers need to be adjusted.",
+              "example": "// JavaScript implementation of a simple linked list node\nclass Node {\n  constructor(data) {\n    this.data = data; // Data stored in the node\n    this.next = null; // Pointer to the next node, initially null\n  }\n}\n\nclass LinkedList {\n  constructor() {\n    this.head = null; // The head of the list, initially null (empty list)\n  }\n}\n\n// Example usage:\nconst list = new LinkedList();\nlist.head = new Node(10); // Create a node and assign it to the head\nlist.head.next = new Node(20); // Add a second node\n"
+            },
+            {
+              "title": "Insertion and Deletion in Linked Lists",
+              "content": "Insertion and deletion are fundamental operations in linked lists. Insertion involves creating a new node and adjusting pointers to insert it into the list. Deletion requires finding the node to be deleted and updating the pointers of its adjacent nodes to bypass it, effectively removing it from the list. These operations are generally more efficient than in arrays, especially when inserting or deleting elements in the middle of the list, as they avoid shifting elements.",
+              "example": "// JavaScript example of inserting a node at the beginning of a linked list\n// Assuming the Node and LinkedList classes from the previous example\n\nLinkedList.prototype.insertAtBeginning = function(data) {\n  const newNode = new Node(data); // Create a new node\n  newNode.next = this.head; // Point the new node's next to the current head\n  this.head = newNode; // Update the head to the new node\n};\n\n// Example usage:\nconst list = new LinkedList();\nlist.insertAtBeginning(5); // Inserts 5 at the beginning\nlist.insertAtBeginning(15); // Inserts 15 at the beginning (15 -> 5)\n"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Which of the following is NOT a benefit of using linked lists over arrays?",
+                "options": [
+                  "Dynamic size",
+                  "Efficient insertion/deletion in the middle",
+                  "Random access of elements",
+                  "Efficient memory utilization"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "What is the time complexity of accessing the nth element in a singly linked list?",
+                "options": [
+                  "O(1)",
+                  "O(log n)",
+                  "O(n)",
+                  "O(n log n)"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "In a singly linked list, what happens when you try to delete the tail node?",
+                "options": [
+                  "The head becomes the tail",
+                  "The list becomes empty",
+                  "You need to traverse the list to find the node before the tail",
+                  "It results in a runtime error"
+                ],
+                "correct": 3
+              },
+              {
+                "question": "Which of the following data structures is typically used to implement a stack?",
+                "options": [
+                  "Array",
+                  "Queue",
+                  "Graph",
+                  "Linked List"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is the purpose of a 'dummy' head node in a linked list?",
+                "options": [
+                  "To simplify insertion and deletion at the beginning of the list",
+                  "To store metadata about the list",
+                  "To prevent memory leaks",
+                  "To improve search performance"
+                ],
+                "correct": 0
+              }
+            ]
+          },
+          "coding": {
+            "title": "Reverse a Singly Linked List",
+            "description": "Given the head of a singly linked list, reverse the list and return the reversed list.  You must do this in-place. The input will be the head of a LinkedList.  The output should be the head of the reversed LinkedList.",
+            "starterCode": "// Definition for singly-linked list.\nfunction ListNode(val, next) {\n  this.val = (val===undefined ? 0 : val)\n  this.next = (next===undefined ? null : next)\n}\n\n/**\n * @param {ListNode} head\n * @return {ListNode}\n */\nfunction reverseList(head) {\n    // Your code here\n    // TODO: Implement the solution to reverse the linked list\n    let prev = null;\n    let current = head;\n    let next = null;\n\n    while (current != null) {\n        next = current.next;\n        current.next = prev;\n        prev = current;\n        current = next;\n    }\n\n    return prev;\n}"
+          }
+        },
+        {
+          "id": 4,
+          "title": "Stacks & Queues",
+          "description": "A stack is a linear data structure that follows the Last-In, First-Out (LIFO) principle. Think of it...",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/lno6Ft0tOZI?si=ekM8NQGpbN5BZ0kT",
+          "concepts": [
+            {
+              "title": "Stacks: LIFO Data Structure",
+              "content": "A stack is a linear data structure that follows the Last-In, First-Out (LIFO) principle. Think of it like a stack of plates – the last plate you put on is the first one you take off. Stacks are crucial for managing function calls, expression evaluation, and undo/redo functionality. They are typically implemented using arrays or linked lists, with operations like push (add to the top), pop (remove from the top), and peek (view the top element) having O(1) time complexity.",
+              "example": "// JavaScript implementation of a Stack\nclass Stack {\n  constructor() {\n    this.items = [];\n  }\n\n  push(element) {\n    // Adds an element to the top of the stack\n    this.items.push(element);\n  }\n\n  pop() {\n    // Removes and returns the element at the top of the stack\n    if (this.isEmpty()) {\n      return \"Underflow\"; // Handle empty stack\n    }\n    return this.items.pop();\n  }\n\n  peek() {\n    // Returns the top element without removing it\n    if (this.isEmpty()) {\n      return \"Empty Stack\";\n    }\n    return this.items[this.items.length - 1];\n  }\n\n  isEmpty() {\n    // Checks if the stack is empty\n    return this.items.length === 0;\n  }\n}\n\n// Example usage:\nconst stack = new Stack();\nstack.push(10);\nstack.push(20);\nconsole.log(stack.peek()); // Output: 20\nconsole.log(stack.pop());  // Output: 20\nconsole.log(stack.peek()); // Output: 10"
+            },
+            {
+              "title": "Queues: FIFO Data Structure",
+              "content": "A queue is a linear data structure that follows the First-In, First-Out (FIFO) principle, similar to a waiting line. The first element added to the queue is the first element removed. Queues are fundamental in managing tasks, handling network requests, and implementing breadth-first search algorithms. Common operations include enqueue (add to the rear), dequeue (remove from the front), and peek (view the front element). Efficient queue implementations often use linked lists or circular arrays to achieve O(1) time complexity for enqueue and dequeue operations.",
+              "example": "// JavaScript implementation of a Queue\nclass Queue {\n  constructor() {\n    this.items = [];\n  }\n\n  enqueue(element) {\n    // Adds an element to the rear of the queue\n    this.items.push(element);\n  }\n\n  dequeue() {\n    // Removes and returns the element at the front of the queue\n    if (this.isEmpty()) {\n      return \"Underflow\"; // Handle empty queue\n    }\n    return this.items.shift();\n  }\n\n  front() {\n    // Returns the front element without removing it\n    if (this.isEmpty()) {\n      return \"Empty Queue\";\n    }\n    return this.items[0];\n  }\n\n  isEmpty() {\n    // Checks if the queue is empty\n    return this.items.length === 0;\n  }\n}\n\n// Example usage:\nconst queue = new Queue();\nqueue.enqueue(10);\nqueue.enqueue(20);\nconsole.log(queue.front()); // Output: 10\nconsole.log(queue.dequeue()); // Output: 10\nconsole.log(queue.front()); // Output: 20"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Which data structure is most suitable for implementing an 'undo' functionality in a text editor?",
+                "options": [
+                  "Queue",
+                  "Stack",
+                  "Linked List",
+                  "Binary Search Tree"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the primary difference between a stack and a queue?",
+                "options": [
+                  "Stacks use LIFO, queues use FIFO.",
+                  "Stacks use FIFO, queues use LIFO.",
+                  "Stacks are dynamic, queues are static.",
+                  "Stacks are implemented with arrays, queues with linked lists."
+                ],
+                "correct": 0
+              },
+              {
+                "question": "In a call stack, what happens when a function calls itself recursively?",
+                "options": [
+                  "The program crashes.",
+                  "A new frame is pushed onto the stack.",
+                  "The oldest frame is popped off the stack.",
+                  "The execution jumps to the main function."
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the time complexity of enqueueing an element into a queue implemented using a linked list?",
+                "options": [
+                  "O(n)",
+                  "O(log n)",
+                  "O(n log n)",
+                  "O(1)"
+                ],
+                "correct": 3
+              },
+              {
+                "question": "Which of the following is NOT a typical application of a queue?",
+                "options": [
+                  "Handling interrupts in an operating system",
+                  "Evaluating arithmetic expressions",
+                  "Managing print jobs in a printer",
+                  "Simulating waiting lines"
+                ],
+                "correct": 1
+              }
+            ]
+          },
+          "coding": {
+            "title": "Balanced Parentheses Checker",
+            "description": "Write a function that checks if a string containing parentheses `()`, curly braces `{}`, and square brackets `[]` is balanced. A string is considered balanced if each opening parenthesis has a corresponding closing parenthesis of the same type, and the parentheses are nested correctly. For example, `(){}[]` is balanced, but `({[}])` and `(]` are not.",
+            "starterCode": "// Function to check if parentheses are balanced\nfunction isBalanced(str) {\n  // Create a stack to store opening parentheses\n  const stack = [];\n\n  // Iterate through the string\n  for (let i = 0; i < str.length; i++) {\n    const char = str[i];\n\n    // If it's an opening parenthesis, push it onto the stack\n    // If it's a closing parenthesis, check if it matches the top of the stack\n\n    // TODO: Implement the logic here\n  }\n\n  // The string is balanced if the stack is empty at the end\n  return stack.length === 0;\n}\n\n// Example usage:\n// console.log(isBalanced(\"(){}[]\")); // Output: true\n// console.log(isBalanced(\"({[}])\")); // Output: false\n// console.log(isBalanced(\"(]\"));    // Output: false"
+          }
+        },
+        {
+          "id": 5,
+          "title": "CodeQuest: The Lost Data Realms",
+          "description": "Complete all three tasks to restore the Digital Realm! Test your knowledge of Arrays, Stacks, and Queues in this interactive game.",
+          "icon": "🎮",
+          "xp": 200,
+          "game": "games/dsa/codequest-game.html",
+          "gameManual": "🎮 Interactive Game: Journey through 5 levels to restore the corrupted Digital Realm!\n\n**Levels:**\n- Level 1: Digital Awakening (Introduction)\n- Level 2: Array Realm (Drag & drop to sort arrays)\n- Level 3: Stack Summit (Learn LIFO with push/pop)\n- Level 4: Queue Quarters (Master FIFO with enqueue/dequeue)\n- Level 5: Core Simulator (Combine all concepts + victory animation)\n\n**Controls:**\n- Mouse: Click buttons and drag elements\n- Complete tasks to collect Data Keys\n- Restore the Digital Realm by mastering DSA concepts!",
+          "coding": {
+            "title": "Balanced Brackets",
+            "description": "A bracket is considered to be any one of the following characters: (, ), {, }, [, or ].\n\nTwo brackets are considered to be a matched pair if the opening bracket (i.e., (, [, or {) occurs to the left of a closing bracket (i.e., ), ], or }) of the exact same type. There are three types of matched pairs of brackets: [], {}, and ().\n\nA matching pair of brackets is not balanced if the set of brackets it encloses are not matched. For example, {[(])} is not balanced because the contents in between { and } are not balanced. The pair of square brackets encloses a single unbalanced opening bracket, (, and the pair of parentheses encloses a single unbalanced closing square bracket, ].\n\nBy this logic, we say a sequence of brackets is balanced if the following conditions are met:\n- It contains no unmatched brackets.\n- The subset of brackets enclosed within the confines of a matched pair of brackets is also a matched pair of brackets.\n\nGiven n strings of brackets, determine whether each sequence of brackets is balanced. If a string is balanced, return YES. Otherwise, return NO.\n\n**Function Description:**\nComplete the function isBalanced. It must return a string: YES if the sequence is balanced or NO if it is not.\n\nisBalanced has the following parameter(s):\n- s: a string of brackets\n\n**Input Format:**\nThe first line contains a single integer n, the number of strings.\nEach of the next n lines contains a single string s, a sequence of brackets.\n\n**Constraints:**\n- 1 ≤ n ≤ 10³\n- 1 ≤ length of s ≤ 10³\n- All characters in the sequences ∈ { {, }, (, ), [, ] }\n\n**Output Format:**\nFor each string, return YES or NO.\n\n**Sample Input:**\n3\n{[()]}\n{[(])}\n{{[[(())]]}}\n\n**Sample Output:**\nYES\nNO\nYES\n\n**Explanation:**\n1. The string {[()]} meets both criteria for being a balanced string.\n2. The string {[(])} is not balanced because the brackets enclosed by the matched pair { and } are not balanced: [(]).\n3. The string {{[[(())]]}} meets both criteria for being a balanced string.",
+            "starterCode": "/*\n * Complete the 'isBalanced' function below.\n *\n * The function is expected to return a STRING.\n * The function accepts STRING s as parameter.\n */\n\nfunction isBalanced(s) {\n    // Create a stack to store opening brackets\n    const stack = [];\n    \n    // Map of matching pairs\n    const pairs = {\n        ')': '(',\n        '}': '{',\n        ']': '['\n    };\n    \n    // Iterate through each character in the string\n    for (let i = 0; i < s.length; i++) {\n        const char = s[i];\n        \n        // If it's an opening bracket, push to stack\n        if (char === '(' || char === '{' || char === '[') {\n            // TODO: Push opening bracket to stack\n            \n        } \n        // If it's a closing bracket\n        else if (char === ')' || char === '}' || char === ']') {\n            // TODO: Check if stack is empty or top doesn't match\n            // If so, return 'NO'\n            \n            // TODO: Pop from stack if it matches\n            \n        }\n    }\n    \n    // TODO: Return 'YES' if stack is empty, 'NO' otherwise\n    \n}\n\n// Test cases\nconsole.log(isBalanced(\"{[()]}\")); // Expected: YES\nconsole.log(isBalanced(\"{[(])}\")); // Expected: NO\nconsole.log(isBalanced(\"{{[[(())]]}}\")); // Expected: YES"
+          }
+        },
+        {
+          "id": 6,
+          "title": "Trees",
+          "description": "Learn Trees",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/YAdLFsTG70w?si=OkvHVhY2rAnqHxQK",
+          "concepts": [
+            {
+              "title": "Introduction to Trees",
+              "content": "A tree is a hierarchical data structure consisting of nodes connected by edges. Each tree has a root node, and every node has zero or more child nodes. Trees are used to represent hierarchical relationships, such as file systems, organizational structures, and HTML DOM. Key terminology includes: root (top node), leaf (node with no children), parent, child, sibling, depth (distance from root), and height (longest path from node to leaf).",
+              "example": "// Basic Tree Node Structure\nclass TreeNode {\n  constructor(value) {\n    this.value = value;\n    this.children = []; // Array of child nodes\n  }\n  \n  addChild(node) {\n    this.children.push(node);\n  }\n}\n\n// Example: Creating a simple tree\nconst root = new TreeNode('A');\nconst nodeB = new TreeNode('B');\nconst nodeC = new TreeNode('C');\nroot.addChild(nodeB);\nroot.addChild(nodeC);"
+            },
+            {
+              "title": "Binary Trees",
+              "content": "A binary tree is a special type of tree where each node has at most two children, referred to as the left child and right child. Binary trees are fundamental in computer science and form the basis for more complex structures like Binary Search Trees, AVL Trees, and Heaps. Properties include: maximum nodes at level l = 2^l, maximum nodes in tree of height h = 2^(h+1) - 1.",
+              "example": "// Binary Tree Node\nclass BinaryTreeNode {\n  constructor(value) {\n    this.value = value;\n    this.left = null;\n    this.right = null;\n  }\n}\n\n// Creating a binary tree\nconst root = new BinaryTreeNode(1);\nroot.left = new BinaryTreeNode(2);\nroot.right = new BinaryTreeNode(3);\nroot.left.left = new BinaryTreeNode(4);\nroot.left.right = new BinaryTreeNode(5);"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What is the maximum number of nodes at level 3 in a binary tree?",
+                "options": [
+                  "4",
+                  "6",
+                  "8",
+                  "16"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "In a tree, a node with no children is called a:",
+                "options": [
+                  "Root",
+                  "Leaf",
+                  "Branch",
+                  "Stem"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the height of a tree with only one node?",
+                "options": [
+                  "0",
+                  "1",
+                  "-1",
+                  "Undefined"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "Which of the following is NOT a type of binary tree?",
+                "options": [
+                  "Full Binary Tree",
+                  "Complete Binary Tree",
+                  "Circular Binary Tree",
+                  "Perfect Binary Tree"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "In a binary tree, each node can have at most how many children?",
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "Unlimited"
+                ],
+                "correct": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "title": "Tree Traversals",
+          "description": "Tree traversals are algorithms for visiting (examining and/or updating) each node in a tree data structure exactly once.",
+          "icon": "🌲",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/-b2lciNd2L4?si=32sFRyBo3mhhrG_N",
+          "concepts": [
+            {
+              "title": "Depth-First Search (DFS) Traversals",
+              "content": "DFS explores as far as possible along each branch before backtracking. Three main DFS traversals for binary trees are: Inorder (Left-Root-Right), Preorder (Root-Left-Right), and Postorder (Left-Right-Root). Inorder traversal of a BST gives nodes in sorted order. Preorder is useful for creating a copy of the tree. Postorder is useful for deleting the tree.",
+              "example": "// Inorder Traversal (Left-Root-Right)\nfunction inorder(node) {\n  if (node === null) return;\n  inorder(node.left);\n  console.log(node.value);\n  inorder(node.right);\n}\n\n// Preorder Traversal (Root-Left-Right)\nfunction preorder(node) {\n  if (node === null) return;\n  console.log(node.value);\n  preorder(node.left);\n  preorder(node.right);\n}"
+            },
+            {
+              "title": "Breadth-First Search (BFS)",
+              "content": "BFS explores all nodes at the present depth before moving to nodes at the next depth level. It uses a queue data structure to keep track of nodes to visit. Level order traversal visits nodes level by level from left to right. This is useful for finding the shortest path in unweighted trees and level-wise processing.",
+              "example": "// Level Order Traversal using Queue\nfunction levelOrder(root) {\n  if (!root) return [];\n  \n  const result = [];\n  const queue = [root];\n  \n  while (queue.length > 0) {\n    const node = queue.shift();\n    result.push(node.value);\n    \n    if (node.left) queue.push(node.left);\n    if (node.right) queue.push(node.right);\n  }\n  \n  return result;\n}"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Which traversal visits the root node last?",
+                "options": [
+                  "Preorder",
+                  "Inorder",
+                  "Postorder",
+                  "Level Order"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Which data structure is used for Level Order Traversal?",
+                "options": [
+                  "Stack",
+                  "Queue",
+                  "Array",
+                  "Linked List"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "For a Binary Search Tree, which traversal gives nodes in sorted order?",
+                "options": [
+                  "Preorder",
+                  "Inorder",
+                  "Postorder",
+                  "Level Order"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the time complexity of tree traversal algorithms?",
+                "options": [
+                  "O(log n)",
+                  "O(n)",
+                  "O(n log n)",
+                  "O(n²)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which traversal is best for creating a copy of a tree?",
+                "options": [
+                  "Inorder",
+                  "Preorder",
+                  "Postorder",
+                  "Level Order"
+                ],
+                "correct": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 8,
+          "title": "Binary Search Trees",
+          "description": "Learn Binary Search Trees",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/cySVml6e_Fc?si=atIuIh4u8K17lMIp",
+          "concepts": [
+            {
+              "title": "BST Properties and Operations",
+              "content": "A Binary Search Tree (BST) is a binary tree where for each node: all values in the left subtree are less than the node's value, and all values in the right subtree are greater. This property enables efficient searching, insertion, and deletion. Average time complexity: O(log n) for search, insert, delete. The inorder traversal of a BST always produces a sorted sequence.",
+              "example": "// BST Node and Basic Operations\nclass BSTNode {\n  constructor(value) {\n    this.value = value;\n    this.left = null;\n    this.right = null;\n  }\n}\n\nfunction search(root, value) {\n  if (!root || root.value === value) return root;\n  \n  if (value < root.value) {\n    return search(root.left, value);\n  }\n  return search(root.right, value);\n}"
+            },
+            {
+              "title": "BST Insertion",
+              "content": "Inserting a node in a BST involves finding the correct position while maintaining the BST property. Start from the root and compare the value to be inserted with the current node. If smaller, go left; if larger, go right. Continue until finding an empty spot. Time complexity: O(h) where h is height.",
+              "example": "// BST Insertion\nfunction insert(root, value) {\n  if (!root) {\n    return new BSTNode(value);\n  }\n  \n  if (value < root.value) {\n    root.left = insert(root.left, value);\n  } else if (value > root.value) {\n    root.right = insert(root.right, value);\n  }\n  \n  return root;\n}"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "In a BST, values in the left subtree are:",
+                "options": [
+                  "Greater than root",
+                  "Less than root",
+                  "Equal to root",
+                  "Random"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the average time complexity for searching in a balanced BST?",
+                "options": [
+                  "O(1)",
+                  "O(log n)",
+                  "O(n)",
+                  "O(n log n)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What traversal of a BST gives elements in sorted order?",
+                "options": [
+                  "Preorder",
+                  "Inorder",
+                  "Postorder",
+                  "Level Order"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "In BST deletion, what is the inorder successor?",
+                "options": [
+                  "Largest in left subtree",
+                  "Smallest in right subtree",
+                  "Parent node",
+                  "Root node"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the worst-case time complexity for search in a skewed BST?",
+                "options": [
+                  "O(1)",
+                  "O(log n)",
+                  "O(n)",
+                  "O(n²)"
+                ],
+                "correct": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": 9,
+          "title": "AVL Trees",
+          "description": "Learn AVL Trees",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/YWqla0UX-38?si=8EiibnZGPBw3W0AU",
+          "concepts": [
+            {
+              "title": "AVL Tree Properties",
+              "content": "An AVL tree is a self-balancing Binary Search Tree where the heights of left and right subtrees of any node differ by at most 1. This balance factor must be -1, 0, or 1 for all nodes. AVL trees guarantee O(log n) time complexity for search, insert, and delete operations. The tree rebalances itself through rotations after insertions and deletions.",
+              "example": "// AVL Node with height\nclass AVLNode {\n  constructor(value) {\n    this.value = value;\n    this.left = null;\n    this.right = null;\n    this.height = 1;\n  }\n}\n\nfunction getHeight(node) {\n  return node ? node.height : 0;\n}\n\nfunction getBalance(node) {\n  return node ? getHeight(node.left) - getHeight(node.right) : 0;\n}"
+            },
+            {
+              "title": "AVL Rotations",
+              "content": "AVL trees use four types of rotations to maintain balance: Left Rotation (LL), Right Rotation (RR), Left-Right Rotation (LR), and Right-Left Rotation (RL). Rotations are performed after insertion or deletion when balance factor becomes ±2. These rotations restructure the tree while maintaining the BST property.",
+              "example": "// Right Rotation\nfunction rightRotate(y) {\n  const x = y.left;\n  const T2 = x.right;\n  \n  // Perform rotation\n  x.right = y;\n  y.left = T2;\n  \n  // Update heights\n  y.height = 1 + Math.max(getHeight(y.left), getHeight(y.right));\n  x.height = 1 + Math.max(getHeight(x.left), getHeight(x.right));\n  \n  return x;\n}"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What is the maximum allowed difference in heights of left and right subtrees in an AVL tree?",
+                "options": [
+                  "0",
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the time complexity of search in an AVL tree?",
+                "options": [
+                  "O(1)",
+                  "O(log n)",
+                  "O(n)",
+                  "O(n log n)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which rotation is used when the left subtree of left child is heavier?",
+                "options": [
+                  "Left Rotation",
+                  "Right Rotation",
+                  "Left-Right Rotation",
+                  "Right-Left Rotation"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "AVL trees are named after:",
+                "options": [
+                  "A programming language",
+                  "Two inventors",
+                  "A company",
+                  "A city"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the balance factor of a node in an AVL tree?",
+                "options": [
+                  "Height of node",
+                  "Height of left - height of right",
+                  "Number of children",
+                  "Depth of node"
+                ],
+                "correct": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 10,
+          "title": "TreeQuest: Guardians of the Forest",
+          "description": "Master tree concepts through an interactive journey! Learn about Trees, Traversals, BST, and AVL Trees.",
+          "icon": "🎮",
+          "xp": 200,
+          "game": "games/dsa/treequest-game.html",
+          "gameManual": "🌳 Interactive Game: Journey through 5 levels to restore the Digital Forest!\n\n**Levels:**\n- Level 1: The Forest Awakens (Learn tree structure basics)\n- Level 2: The Path of Traversal (Master Inorder, Preorder, Postorder)\n- Level 3: The Binary Grove (Build Binary Search Trees)\n- Level 4: The Balanced Domain (Balance AVL Trees with rotations)\n- Level 5: The Digital Canopy (Final revision challenge)\n\n**Controls:**\n- Mouse: Click nodes, drag elements, and select options\n- Complete all tasks to restore the Forest of Data!\n- Master Trees, BST, AVL, and Traversals!",
+          "coding": {
+            "title": "Binary Tree Level Order Traversal",
+            "description": "Given the root of a binary tree, return the level order traversal of its nodes' values (i.e., from left to right, level by level).\n\n**Example 1:**\nInput: root = [3,9,20,null,null,15,7]\nOutput: [[3],[9,20],[15,7]]\n\n**Example 2:**\nInput: root = [1]\nOutput: [[1]]\n\n**Example 3:**\nInput: root = []\nOutput: []\n\n**Constraints:**\n- The number of nodes in the tree is in the range [0, 2000]\n- -1000 <= Node.val <= 1000\n\n**Function Description:**\nComplete the function levelOrder. It should return a 2D array where each sub-array contains the values of nodes at that level.\n\nlevelOrder has the following parameter:\n- root: the root node of the binary tree\n\n**Note:** This is a popular HackerRank/LeetCode problem testing BFS and Queue concepts.",
+            "starterCode": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n\n/**\n * @param {TreeNode} root\n * @return {number[][]}\n */\nfunction levelOrder(root) {\n    // Handle empty tree\n    if (!root) return [];\n    \n    const result = [];\n    const queue = [root];\n    \n    while (queue.length > 0) {\n        const levelSize = queue.length;\n        const currentLevel = [];\n        \n        // Process all nodes at current level\n        for (let i = 0; i < levelSize; i++) {\n            const node = queue.shift();\n            currentLevel.push(node.val);\n            \n            // TODO: Add left child to queue if exists\n            \n            // TODO: Add right child to queue if exists\n            \n        }\n        \n        // TODO: Add current level to result\n        \n    }\n    \n    return result;\n}\n\n// Test cases\n// const root1 = new TreeNode(3, new TreeNode(9), new TreeNode(20, new TreeNode(15), new TreeNode(7)));\n// console.log(levelOrder(root1)); // Expected: [[3],[9,20],[15,7]]"
+          }
+        },
+        {
+          "id": 11,
+          "title": "Graphs",
+          "description": "Learn Graphs",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/5hPfm_uqXmw?si=8ZgsczL-kYzjoLeT",
+          "concepts": [
+            {
+              "title": "Graph Fundamentals",
+              "content": "A graph is a non-linear data structure consisting of vertices (nodes) and edges (connections). Graphs can be directed (edges have direction) or undirected (edges are bidirectional). They can be weighted (edges have values) or unweighted. Key terminology: adjacent vertices (connected by edge), degree (number of edges connected to vertex), path (sequence of vertices), cycle (path that starts and ends at same vertex). Graphs model real-world networks like social networks, maps, computer networks, and dependencies.",
+              "example": "// Graph using Adjacency List\nclass Graph {\n  constructor() {\n    this.adjacencyList = new Map();\n  }\n  \n  addVertex(vertex) {\n    if (!this.adjacencyList.has(vertex)) {\n      this.adjacencyList.set(vertex, []);\n    }\n  }\n  \n  addEdge(v1, v2) {\n    this.adjacencyList.get(v1).push(v2);\n    this.adjacencyList.get(v2).push(v1); // For undirected\n  }\n}\n\nconst graph = new Graph();\ngraph.addVertex('A');\ngraph.addVertex('B');\ngraph.addEdge('A', 'B');"
+            },
+            {
+              "title": "Graph Representations",
+              "content": "Two main ways to represent graphs: 1) Adjacency Matrix: 2D array where matrix[i][j] = 1 if edge exists. Space: O(V²), Edge lookup: O(1). Good for dense graphs. 2) Adjacency List: Array/Map of lists where each vertex stores list of adjacent vertices. Space: O(V+E), Edge lookup: O(degree). Good for sparse graphs. Choice depends on graph density and required operations.",
+              "example": "// Adjacency Matrix\nclass GraphMatrix {\n  constructor(vertices) {\n    this.V = vertices;\n    this.matrix = Array(vertices).fill(0).map(() => Array(vertices).fill(0));\n  }\n  \n  addEdge(i, j) {\n    this.matrix[i][j] = 1;\n    this.matrix[j][i] = 1; // Undirected\n  }\n}\n\nconst g = new GraphMatrix(4);\ng.addEdge(0, 1);\ng.addEdge(1, 2);"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "In a directed graph, edges have:",
+                "options": [
+                  "No direction",
+                  "One direction",
+                  "Two directions",
+                  "Multiple directions"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the space complexity of an adjacency matrix for V vertices?",
+                "options": [
+                  "O(V)",
+                  "O(V²)",
+                  "O(E)",
+                  "O(V+E)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which representation is better for sparse graphs?",
+                "options": [
+                  "Adjacency Matrix",
+                  "Adjacency List",
+                  "Both are equal",
+                  "Neither"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "The degree of a vertex is:",
+                "options": [
+                  "Its depth",
+                  "Number of edges connected to it",
+                  "Its height",
+                  "Its value"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "A path that starts and ends at the same vertex is called:",
+                "options": [
+                  "Loop",
+                  "Cycle",
+                  "Circuit",
+                  "Edge"
+                ],
+                "correct": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 12,
+          "title": "BFS & DFS",
+          "description": "Learn BFS & DFS",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/vf-cxgUXcMk?si=Of-5GHpkek3rBO9D",
+          "concepts": [
+            {
+              "title": "Breadth-First Search (BFS)",
+              "content": "BFS explores graph level by level, visiting all neighbors before moving to next level. Uses a queue. Applications: shortest path in unweighted graphs, level-order traversal, finding connected components, testing bipartiteness. Time: O(V+E), Space: O(V). BFS guarantees shortest path in unweighted graphs. Requires visited array to avoid cycles.",
+              "example": "// BFS Implementation\nfunction bfs(graph, start) {\n  const visited = new Set();\n  const queue = [start];\n  const result = [];\n  visited.add(start);\n  \n  while (queue.length > 0) {\n    const vertex = queue.shift();\n    result.push(vertex);\n    \n    for (let neighbor of graph.get(vertex)) {\n      if (!visited.has(neighbor)) {\n        visited.add(neighbor);\n        queue.push(neighbor);\n      }\n    }\n  }\n  return result;\n}"
+            },
+            {
+              "title": "Depth-First Search (DFS)",
+              "content": "DFS explores as far as possible along each branch before backtracking. Can be implemented recursively or with a stack. Applications: detecting cycles, topological sorting, finding strongly connected components, solving mazes. Time: O(V+E), Space: O(V). DFS doesn't guarantee shortest path but uses less memory than BFS for deep graphs.",
+              "example": "// DFS Recursive\nfunction dfs(graph, vertex, visited = new Set(), result = []) {\n  visited.add(vertex);\n  result.push(vertex);\n  \n  for (let neighbor of graph.get(vertex)) {\n    if (!visited.has(neighbor)) {\n      dfs(graph, neighbor, visited, result);\n    }\n  }\n  return result;\n}"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Which data structure does BFS use?",
+                "options": [
+                  "Stack",
+                  "Queue",
+                  "Heap",
+                  "Tree"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which algorithm guarantees shortest path in unweighted graphs?",
+                "options": [
+                  "DFS",
+                  "BFS",
+                  "Both",
+                  "Neither"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the time complexity of BFS and DFS?",
+                "options": [
+                  "O(V)",
+                  "O(E)",
+                  "O(V+E)",
+                  "O(V*E)"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "DFS can be implemented using:",
+                "options": [
+                  "Only recursion",
+                  "Only stack",
+                  "Both recursion and stack",
+                  "Only queue"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Which traversal explores level by level?",
+                "options": [
+                  "DFS",
+                  "BFS",
+                  "Both",
+                  "Neither"
+                ],
+                "correct": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 13,
+          "title": "Dijkstra's Algorithm",
+          "description": "Learn Dijkstra's Algorithm",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/smHnz2RHJBY?si=YVX6KMtXNxgpJIw9",
+          "concepts": [
+            {
+              "title": "Dijkstra's Algorithm Basics",
+              "content": "Dijkstra's algorithm finds the shortest path from a source vertex to all other vertices in a weighted graph with non-negative edge weights. Uses a greedy approach, always selecting the vertex with minimum distance. Uses a priority queue (min-heap) for efficiency. Time: O((V+E) log V) with binary heap. Cannot handle negative edge weights. Applications: GPS navigation, network routing, social networking.",
+              "example": "// Dijkstra's Algorithm (simplified)\nfunction dijkstra(graph, start) {\n  const distances = {};\n  const visited = new Set();\n  const pq = []; // Priority queue\n  \n  for (let vertex in graph) {\n    distances[vertex] = vertex === start ? 0 : Infinity;\n  }\n  \n  pq.push({vertex: start, distance: 0});\n  \n  while (pq.length > 0) {\n    pq.sort((a, b) => a.distance - b.distance);\n    const {vertex, distance} = pq.shift();\n    \n    if (visited.has(vertex)) continue;\n    visited.add(vertex);\n    \n    for (let neighbor in graph[vertex]) {\n      const newDist = distance + graph[vertex][neighbor];\n      if (newDist < distances[neighbor]) {\n        distances[neighbor] = newDist;\n        pq.push({vertex: neighbor, distance: newDist});\n      }\n    }\n  }\n  return distances;\n}"
+            },
+            {
+              "title": "Dijkstra's Algorithm Steps",
+              "content": "Algorithm steps: 1) Initialize distances: source = 0, all others = infinity. 2) Create a priority queue with source vertex. 3) While queue not empty: extract vertex with minimum distance, for each unvisited neighbor calculate distance through current vertex, if new distance < stored distance update and add to queue. The algorithm maintains a set of visited vertices and always processes the closest unvisited vertex next.",
+              "example": "// Example: Finding shortest path\n// Graph: A-1-B-2-D\n//        |     |\n//        4     1\n//        |     |\n//        C-----+\n//\n// From A:\n// Step 1: A=0, B=∞, C=∞, D=∞\n// Step 2: Visit A, update B=1, C=4\n// Step 3: Visit B, update D=3\n// Step 4: Visit D, C=4 (no change)\n// Result: A=0, B=1, C=4, D=3"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Dijkstra's algorithm finds:",
+                "options": [
+                  "Longest path",
+                  "Shortest path",
+                  "All paths",
+                  "Minimum spanning tree"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Can Dijkstra's algorithm handle negative edge weights?",
+                "options": [
+                  "Yes",
+                  "No",
+                  "Sometimes",
+                  "Only in directed graphs"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What data structure is used for efficiency in Dijkstra's?",
+                "options": [
+                  "Stack",
+                  "Queue",
+                  "Priority Queue",
+                  "Array"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Time complexity of Dijkstra's with binary heap?",
+                "options": [
+                  "O(V)",
+                  "O(V²)",
+                  "O((V+E) log V)",
+                  "O(V*E)"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Dijkstra's algorithm uses which approach?",
+                "options": [
+                  "Divide and Conquer",
+                  "Dynamic Programming",
+                  "Greedy",
+                  "Backtracking"
+                ],
+                "correct": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": 14,
+          "title": "Minimum Spanning Tree",
+          "description": "Learn Minimum Spanning Tree",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/vNhvBrc02G4?si=YkAMELSRIF5QaGtD",
+          "concepts": [
+            {
+              "title": "MST Fundamentals",
+              "content": "A Minimum Spanning Tree (MST) of a weighted, connected, undirected graph is a subset of edges that connects all vertices with minimum total edge weight, without forming cycles. Properties: MST has V-1 edges for V vertices, removing any edge disconnects the tree, adding any edge creates a cycle. Applications: network design (minimizing cable length), clustering, approximation algorithms. Two main algorithms: Kruskal's (edge-based) and Prim's (vertex-based).",
+              "example": "// Edge class for MST\nclass Edge {\n  constructor(src, dest, weight) {\n    this.src = src;\n    this.dest = dest;\n    this.weight = weight;\n  }\n}\n\n// Example graph:\n// A-1-B\n// |   |\n// 4   3\n// |   |\n// C-5-D\n// MST: A-B(1), A-D(2), B-D(3)\n// Total: 6"
+            },
+            {
+              "title": "Kruskal's and Prim's Algorithms",
+              "content": "Kruskal's Algorithm: Sort all edges by weight, add edges one by one if they don't form cycle (use Union-Find). Time: O(E log E). Prim's Algorithm: Start from any vertex, repeatedly add minimum weight edge connecting tree to non-tree vertex (use priority queue). Time: O(E log V). Both produce same total weight but may have different edge sets. Kruskal's better for sparse graphs, Prim's better for dense graphs.",
+              "example": "// Kruskal's (simplified)\nfunction kruskal(edges, vertices) {\n  const mst = [];\n  edges.sort((a, b) => a.weight - b.weight);\n  const parent = {};\n  \n  // Initialize Union-Find\n  vertices.forEach(v => parent[v] = v);\n  \n  function find(v) {\n    if (parent[v] !== v) parent[v] = find(parent[v]);\n    return parent[v];\n  }\n  \n  for (let edge of edges) {\n    const root1 = find(edge.src);\n    const root2 = find(edge.dest);\n    if (root1 !== root2) {\n      mst.push(edge);\n      parent[root1] = root2;\n    }\n  }\n  return mst;\n}"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "How many edges does an MST have for V vertices?",
+                "options": [
+                  "V",
+                  "V-1",
+                  "V+1",
+                  "2V"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which algorithm sorts edges by weight?",
+                "options": [
+                  "Prim's",
+                  "Kruskal's",
+                  "Dijkstra's",
+                  "BFS"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What data structure does Kruskal's use to detect cycles?",
+                "options": [
+                  "Stack",
+                  "Queue",
+                  "Union-Find",
+                  "Heap"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "Time complexity of Kruskal's algorithm?",
+                "options": [
+                  "O(V)",
+                  "O(E log E)",
+                  "O(V²)",
+                  "O(E)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Can an MST have cycles?",
+                "options": [
+                  "Yes",
+                  "No",
+                  "Sometimes",
+                  "Only in directed graphs"
+                ],
+                "correct": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": 15,
+          "title": "GraphQuest: The Network Nexus",
+          "description": "Master graph algorithms through an epic journey! Restore the Digital Network by solving Graph, BFS, DFS, Dijkstra, and MST challenges.",
+          "icon": "🎮",
+          "xp": 200,
+          "game": "games/dsa/graphquest-game.html",
+          "gameManual": "🌐 Interactive Game: Journey through 5 levels to restore the broken Digital Network!\n\n**Levels:**\n- Level 1: The Broken Network (Connect nodes to learn graph basics)\n- Level 2: Path of Exploration (Master BFS traversal order)\n- Level 3: The Depth Realm (Master DFS traversal with depth visualization)\n- Level 4: The Path of Light (Find shortest path using Dijkstra's algorithm)\n- Level 5: The Network Core (Build Minimum Spanning Tree)\n\n**Controls:**\n- Mouse: Click nodes, edges, and buttons\n- Complete all 5 levels to restore the Digital Nexus!\n- Master Graphs, BFS, DFS, Dijkstra, and MST concepts!",
+          "coding": {
+            "title": "Number of Islands",
+            "description": "Given an m x n 2D binary grid which represents a map of '1's (land) and '0's (water), return the number of islands.\n\nAn island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.\n\n**Example 1:**\nInput: grid = [\n  [\"1\",\"1\",\"1\",\"1\",\"0\"],\n  [\"1\",\"1\",\"0\",\"1\",\"0\"],\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"0\",\"0\",\"0\",\"0\",\"0\"]\n]\nOutput: 1\n\n**Example 2:**\nInput: grid = [\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"1\",\"1\",\"0\",\"0\",\"0\"],\n  [\"0\",\"0\",\"1\",\"0\",\"0\"],\n  [\"0\",\"0\",\"0\",\"1\",\"1\"]\n]\nOutput: 3\n\n**Constraints:**\n- m == grid.length\n- n == grid[i].length\n- 1 <= m, n <= 300\n- grid[i][j] is '0' or '1'\n\n**Function Description:**\nComplete the function numIslands. It should return an integer representing the number of islands.\n\nnumIslands has the following parameter:\n- grid: a 2D array of strings representing the map\n\n**Note:** This is a popular LeetCode/HackerRank problem testing Graph traversal (DFS/BFS) concepts.",
+            "starterCode": "/**\n * @param {character[][]} grid\n * @return {number}\n */\nfunction numIslands(grid) {\n    if (!grid || grid.length === 0) return 0;\n    \n    const rows = grid.length;\n    const cols = grid[0].length;\n    let count = 0;\n    \n    // Helper function to perform DFS\n    function dfs(i, j) {\n        // Check boundaries and if current cell is water or visited\n        if (i < 0 || i >= rows || j < 0 || j >= cols || grid[i][j] === '0') {\n            return;\n        }\n        \n        // Mark current cell as visited by changing it to '0'\n        grid[i][j] = '0';\n        \n        // TODO: Explore all 4 directions (up, down, left, right)\n        // dfs(i - 1, j); // up\n        // dfs(i + 1, j); // down\n        // dfs(i, j - 1); // left\n        // dfs(i, j + 1); // right\n    }\n    \n    // Iterate through each cell in the grid\n    for (let i = 0; i < rows; i++) {\n        for (let j = 0; j < cols; j++) {\n            // TODO: If we find land ('1'), increment count and perform DFS\n            // to mark all connected land as visited\n            \n        }\n    }\n    \n    return count;\n}\n\n// Test cases\n// const grid1 = [[\"1\",\"1\",\"1\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"1\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"0\",\"0\"]];\n// console.log(numIslands(grid1)); // Expected: 1\n\n// const grid2 = [[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"1\",\"1\",\"0\",\"0\",\"0\"],[\"0\",\"0\",\"1\",\"0\",\"0\"],[\"0\",\"0\",\"0\",\"1\",\"1\"]];\n// console.log(numIslands(grid2)); // Expected: 3"
+          }
+        },
+        {
+          "id": 16,
+          "title": "Hashing",
+          "description": "Learn about hashing, a powerful technique for efficient data storage and retrieval, and how to handle collisions effectively. Explore various hashing algorithms and their real-world applications, including hash tables and caching.",
+          "icon": "🔑",
+          "xp": 100,
+          "videoUrl": "",
+          "concepts": [
+            {
+              "title": "Hash Functions and Hash Tables",
+              "content": "A hash function maps keys to indices in a hash table, allowing for (ideally) O(1) average-case complexity for insertion, deletion, and retrieval. Hash tables use an array to store data, where the index is calculated by applying the hash function to the key. The choice of hash function is crucial for performance; a good hash function distributes keys evenly across the table, minimizing collisions. Without hashing, searching for a specific element in a large dataset would require iterating through each element, resulting in O(n) time complexity.",
+              "example": "// Simple hash function (not suitable for production)\nfunction simpleHash(key, tableSize) {\n  let hash = 0;\n  for (let i = 0; i < key.length; i++) {\n    hash += key.charCodeAt(i);\n  }\n  return hash % tableSize;\n}\n\n// Example hash table\nclass HashTable {\n  constructor(size) {\n    this.table = new Array(size);\n    this.size = size;\n  }\n\n  set(key, value) {\n    const index = simpleHash(key, this.size);\n    this.table[index] = value;\n  }\n\n  get(key) {\n    const index = simpleHash(key, this.size);\n    return this.table[index];\n  }\n}\n\nconst ht = new HashTable(10);\nht.set('apple', 1);\nht.set('banana', 2);\nconsole.log(ht.get('apple')); // Output: 1"
+            },
+            {
+              "title": "Collision Resolution Techniques",
+              "content": "Collisions occur when two different keys map to the same index in a hash table. Common collision resolution techniques include separate chaining (using linked lists at each index) and open addressing (probing for an empty slot within the table). Separate chaining avoids clustering but introduces the overhead of linked list traversal. Open addressing techniques, like linear probing, quadratic probing, and double hashing, aim to find an alternative slot within the table, but can suffer from clustering if not implemented carefully. Choosing the right collision resolution technique is crucial for maintaining good performance in the face of collisions.",
+              "example": "// Example of Separate Chaining\nclass HashTable {\n    constructor(size) {\n        this.table = new Array(size).fill(null).map(() => []); // Array of linked lists\n        this.size = size;\n    }\n\n    hash(key) {\n        let hash = 0;\n        for (let i = 0; i < key.length; i++) {\n            hash = (hash + key.charCodeAt(i) * i) % this.size;\n        }\n        return hash;\n    }\n\n    set(key, value) {\n        const index = this.hash(key);\n        this.table[index].push([key, value]);\n    }\n\n    get(key) {\n        const index = this.hash(key);\n        for (let i = 0; i < this.table[index].length; i++) {\n            if (this.table[index][i][0] === key) {\n                return this.table[index][i][1];\n            }\n        }\n        return undefined;\n    }\n}\n\nconst ht = new HashTable(10);\nht.set('John', '555-1234');\nht.set('Jane', '555-5678');\nht.set('Joan', '555-9012'); // Possible collision with 'John' depending on hash function\nconsole.log(ht.get('John')); // Output: 555-1234\nconsole.log(ht.get('Joan')); // Output: 555-9012"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "Which of the following is NOT a typical collision resolution technique in hash tables?",
+                "options": [
+                  "Separate Chaining",
+                  "Linear Probing",
+                  "Quadratic Probing",
+                  "Depth-First Search"
+                ],
+                "correct": 3
+              },
+              {
+                "question": "What is the primary purpose of a hash function?",
+                "options": [
+                  "To encrypt data for security.",
+                  "To map keys to indices in a hash table.",
+                  "To sort data in ascending order.",
+                  "To compress data for storage."
+                ],
+                "correct": 1
+              },
+              {
+                "question": "In a hash table with separate chaining, what data structure is typically used to store elements that hash to the same index?",
+                "options": [
+                  "Array",
+                  "Binary Tree",
+                  "Linked List",
+                  "Stack"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "What is the average-case time complexity for searching an element in a hash table with a good hash function?",
+                "options": [
+                  "O(n)",
+                  "O(1)",
+                  "O(log n)",
+                  "O(n log n)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which of the following collision resolution techniques is most susceptible to primary clustering?",
+                "options": [
+                  "Separate Chaining",
+                  "Quadratic Probing",
+                  "Double Hashing",
+                  "Linear Probing"
+                ],
+                "correct": 3
+              }
+            ]
+          },
+          "coding": {
+            "title": "First Unique Character",
+            "description": "Given a string, find the first non-repeating character in it and return its index. If it doesn't exist, return -1.\n\nExample 1:\ns = 'leetcode'\nreturn 0.\n\nExample 2:\ns = 'loveleetcode'\nreturn 2.\n\nConstraints:\n- 1 <= s.length <= 10^5\n- s consists of lowercase English letters.",
+            "starterCode": "// Function to find the index of the first unique character in a string\nfunction solution(s) {\n  // Create a map to store the frequency of each character\n  const charFrequency = new Map();\n\n  // Iterate through the string to count character frequencies\n  for (let i = 0; i < s.length; i++) {\n    const char = s[i];\n    charFrequency.set(char, (charFrequency.get(char) || 0) + 1);\n  }\n\n  // Iterate through the string again to find the first unique character\n  for (let i = 0; i < s.length; i++) {\n    const char = s[i];\n    if (charFrequency.get(char) === 1) {\n      return i;\n    }\n  }\n\n  // If no unique character is found, return -1\n  return -1;\n}"
+          }
+        },
+        {
+          "id": 17,
+          "title": "Heaps",
+          "description": "Master heap data structures, including min-heaps and max-heaps, and learn how they enable efficient priority queue operations and heap sort algorithms.",
+          "icon": "⛰️",
+          "xp": 100,
+          "videoUrl": "https://youtu.be/NEtwJASLU8Q?si=VUYX5UDxSF4zyB01",
+          "concepts": [
+            {
+              "title": "Heap Properties and Structure",
+              "content": "A heap is a complete binary tree that satisfies the heap property. In a max-heap, every parent node has a value greater than or equal to its children, while in a min-heap, every parent is less than or equal to its children. Heaps are typically implemented using arrays for efficient storage and access. The parent-child relationship follows simple formulas: for a node at index i, its left child is at 2i+1, right child at 2i+2, and parent at floor((i-1)/2). This structure enables O(log n) insertion and deletion while maintaining O(1) access to the maximum (max-heap) or minimum (min-heap) element.",
+              "example": "// Min-Heap Implementation\nclass MinHeap {\n  constructor() {\n    this.heap = [];\n  }\n\n  // Get parent, left child, and right child indices\n  getParentIndex(i) { return Math.floor((i - 1) / 2); }\n  getLeftChildIndex(i) { return 2 * i + 1; }\n  getRightChildIndex(i) { return 2 * i + 2; }\n\n  // Helper methods\n  hasParent(i) { return this.getParentIndex(i) >= 0; }\n  hasLeftChild(i) { return this.getLeftChildIndex(i) < this.heap.length; }\n  hasRightChild(i) { return this.getRightChildIndex(i) < this.heap.length; }\n\n  parent(i) { return this.heap[this.getParentIndex(i)]; }\n  leftChild(i) { return this.heap[this.getLeftChildIndex(i)]; }\n  rightChild(i) { return this.heap[this.getRightChildIndex(i)]; }\n\n  swap(i, j) {\n    [this.heap[i], this.heap[j]] = [this.heap[j], this.heap[i]];\n  }\n\n  peek() {\n    if (this.heap.length === 0) throw new Error('Heap is empty');\n    return this.heap[0];\n  }\n}"
+            },
+            {
+              "title": "Heap Operations: Insert and Extract",
+              "content": "Insertion in a heap involves adding the new element at the end of the array and then 'bubbling up' (heapify up) to restore the heap property by comparing with parents and swapping if necessary. Extraction removes the root element (min or max), replaces it with the last element, and then 'bubbles down' (heapify down) by comparing with children and swapping with the smaller child (min-heap) or larger child (max-heap). Both operations maintain O(log n) time complexity. Heaps are the foundation for priority queues, which are essential in algorithms like Dijkstra's shortest path, Huffman coding, and task scheduling systems.",
+              "example": "// Min-Heap Insert and Extract Operations\nclass MinHeap {\n  // ... (previous code)\n\n  insert(value) {\n    this.heap.push(value);\n    this.heapifyUp();\n  }\n\n  heapifyUp() {\n    let index = this.heap.length - 1;\n    while (this.hasParent(index) && this.parent(index) > this.heap[index]) {\n      this.swap(this.getParentIndex(index), index);\n      index = this.getParentIndex(index);\n    }\n  }\n\n  extractMin() {\n    if (this.heap.length === 0) throw new Error('Heap is empty');\n    if (this.heap.length === 1) return this.heap.pop();\n\n    const min = this.heap[0];\n    this.heap[0] = this.heap.pop();\n    this.heapifyDown();\n    return min;\n  }\n\n  heapifyDown() {\n    let index = 0;\n    while (this.hasLeftChild(index)) {\n      let smallerChildIndex = this.getLeftChildIndex(index);\n      if (this.hasRightChild(index) && this.rightChild(index) < this.leftChild(index)) {\n        smallerChildIndex = this.getRightChildIndex(index);\n      }\n\n      if (this.heap[index] < this.heap[smallerChildIndex]) break;\n      this.swap(index, smallerChildIndex);\n      index = smallerChildIndex;\n    }\n  }\n}\n\n// Example usage\nconst minHeap = new MinHeap();\nminHeap.insert(5);\nminHeap.insert(3);\nminHeap.insert(7);\nminHeap.insert(1);\nconsole.log(minHeap.extractMin()); // Output: 1\nconsole.log(minHeap.peek()); // Output: 3"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "In a max-heap, what is the relationship between a parent node and its children?",
+                "options": [
+                  "Parent is smaller than both children",
+                  "Parent is greater than or equal to both children",
+                  "Parent is equal to both children",
+                  "No specific relationship"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "What is the time complexity of inserting an element into a heap?",
+                "options": [
+                  "O(1)",
+                  "O(log n)",
+                  "O(n)",
+                  "O(n log n)"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "In an array-based heap implementation, if a node is at index i, where is its left child?",
+                "options": [
+                  "2i",
+                  "2i + 1",
+                  "i + 1",
+                  "i / 2"
+                ],
+                "correct": 1
+              },
+              {
+                "question": "Which operation in a heap always returns the minimum (in min-heap) or maximum (in max-heap) element?",
+                "options": [
+                  "Insert",
+                  "Delete",
+                  "Peek",
+                  "Heapify"
+                ],
+                "correct": 2
+              },
+              {
+                "question": "What is the primary use case for heap data structures?",
+                "options": [
+                  "Sorting arrays in place",
+                  "Implementing priority queues",
+                  "Storing key-value pairs",
+                  "Graph traversal"
+                ],
+                "correct": 1
+              }
+            ]
+          },
+          "coding": {
+            "title": "Kth Largest Element in an Array",
+            "description": "Given an integer array nums and an integer k, return the kth largest element in the array.\n\nNote that it is the kth largest element in the sorted order, not the kth distinct element.\n\nExample 1:\nInput: nums = [3,2,1,5,6,4], k = 2\nOutput: 5\n\nExample 2:\nInput: nums = [3,2,3,1,2,4,5,5,6], k = 4\nOutput: 4\n\nConstraints:\n- 1 <= k <= nums.length <= 10^4\n- -10^4 <= nums[i] <= 10^4\n\nHint: Use a min-heap of size k to efficiently find the kth largest element.",
+            "starterCode": "// Function to find the kth largest element using a min-heap\nfunction findKthLargest(nums, k) {\n  // Create a min-heap to store the k largest elements\n  const minHeap = [];\n\n  // Helper function to maintain heap property\n  function heapifyUp(arr, index) {\n    while (index > 0) {\n      const parentIndex = Math.floor((index - 1) / 2);\n      if (arr[parentIndex] <= arr[index]) break;\n      [arr[parentIndex], arr[index]] = [arr[index], arr[parentIndex]];\n      index = parentIndex;\n    }\n  }\n\n  function heapifyDown(arr, index) {\n    const length = arr.length;\n    while (true) {\n      let smallest = index;\n      const left = 2 * index + 1;\n      const right = 2 * index + 2;\n\n      if (left < length && arr[left] < arr[smallest]) smallest = left;\n      if (right < length && arr[right] < arr[smallest]) smallest = right;\n      if (smallest === index) break;\n\n      [arr[index], arr[smallest]] = [arr[smallest], arr[index]];\n      index = smallest;\n    }\n  }\n\n  // TODO: Implement the solution\n  // 1. Iterate through nums\n  // 2. If heap size < k, add element and heapify up\n  // 3. If element > heap[0] (min element), replace and heapify down\n  // 4. Return heap[0] (the kth largest element)\n\n  for (let num of nums) {\n    if (minHeap.length < k) {\n      minHeap.push(num);\n      heapifyUp(minHeap, minHeap.length - 1);\n    } else if (num > minHeap[0]) {\n      minHeap[0] = num;\n      heapifyDown(minHeap, 0);\n    }\n  }\n\n  return minHeap[0];\n}\n\n// Test cases\nconsole.log(findKthLargest([3,2,1,5,6,4], 2)); // Expected: 5\nconsole.log(findKthLargest([3,2,3,1,2,4,5,5,6], 4)); // Expected: 4"
+          }
+        },
+        {
+          "id": 18,
+          "title": "Dynamic Programming",
+          "description": "Learn Dynamic Programming",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "",
+          "concepts": [
+            {
+              "title": "Dynamic Programming",
+              "content": "Core concepts of Dynamic Programming",
+              "example": "// Example code"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What is Dynamic Programming?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Dynamic Programming?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Dynamic Programming?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Dynamic Programming?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Dynamic Programming?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              }
+            ]
+          },
+          "coding": {
+            "title": "Dynamic Programming Challenge",
+            "description": "Implement the solution",
+            "starterCode": "// Your code here"
+          }
+        },
+        {
+          "id": 19,
+          "title": "Greedy Algorithms",
+          "description": "Learn Greedy Algorithms",
+          "icon": "📚",
+          "xp": 100,
+          "videoUrl": "",
+          "concepts": [
+            {
+              "title": "Greedy Algorithms",
+              "content": "Core concepts of Greedy Algorithms",
+              "example": "// Example code"
+            }
+          ],
+          "quiz": {
+            "questions": [
+              {
+                "question": "What is Greedy Algorithms?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Greedy Algorithms?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Greedy Algorithms?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Greedy Algorithms?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              },
+              {
+                "question": "What is Greedy Algorithms?",
+                "options": [
+                  "Option A",
+                  "Option B",
+                  "Option C",
+                  "Option D"
+                ],
+                "correct": 0
+              }
+            ]
+          },
+          "coding": {
+            "title": "Greedy Algorithms Challenge",
+            "description": "Implement the solution",
+            "starterCode": "// Your code here"
+          }
+        },
+        {
+          "id": 20,
+          "title": "Level 20 Challenge",
+          "description": "Revising Point",
+          "icon": "🎮",
+          "xp": 200,
+          "game": "dsa-level-20-game",
+          "gameManual": "🎮 Challenge game for level 20",
+          "coding": {
+            "title": "Level 20 Challenge",
+            "description": "Advanced challenge",
+            "starterCode": "// Your code here"
+          }
+        }
+      ]
+    }
+  }
+}
