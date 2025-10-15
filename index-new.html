@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeVerse: The Logic Forge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phaser.js -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #1e1e3f; color: #f0f0f0; }
+        .card { background-color: #2c2c54; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
+        .btn-primary { background-color: #7b3fe8; color: white; transition: background-color 0.2s; }
+        .btn-primary:hover { background-color: #6333c9; }
+        .input-field { border: 1px solid #4a4a7a; background-color: #1a1a3a; color: #f0f0f0; }
+        .nav-link { color: #bdbdff; border-bottom: 2px solid transparent; transition: border-bottom 0.2s; }
+        .nav-link:hover, .nav-active { border-bottom: 2px solid #a3b0ff; color: white; }
+        .tab-button {
+            padding: 8px 16px; margin-right: 8px; border-radius: 8px;
+            background-color: #3a3a6a; color: #bdbdff; cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .tab-button:hover { background-color: #4a4a7a; }
+        .tab-button.active { background-color: #a3b0ff; color: #1e1e3f; font-weight: bold; }
+        .scrollable-content::-webkit-scrollbar { width: 8px; }
+        .scrollable-content::-webkit-scrollbar-track { background: #1a1a3a; }
+        .scrollable-content::-webkit-scrollbar-thumb { background: #7b3fe8; border-radius: 4px; }
+        .avatar-option {
+            width: 60px; height: 60px; font-size: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid transparent; border-radius: 50%; cursor: pointer;
+            transition: all 0.15s;
+        }
+        .avatar-option.selected { border-color: #a3b0ff; background-color: #3a3a6a; transform: scale(1.1); }
+        .topic-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .topic-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(123, 63, 232, 0.3); }
+        #game-container { min-height: 600px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Firebase & Core Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA92E7a67gbSmNCN5w_f65vMq4NNHbWuAA",
+            authDomain: "codeverse-80575.firebaseapp.com",
+            projectId: "codeverse-80575",
+            storageBucket: "codeverse-80575.firebasestorage.app",
+            messagingSenderId: "586270087321",
+            appId: "1:586270087321:web:c1b159d173173206844008",
+            measurementId: "G-G5QFP52K2G"
+        };
+
+        // Global State
+        let app, database, auth;
+        window.currentUserId = null;
+        window.currentUserData = {};
+        let currentView = 'loading';
+        let selectedAvatar = '🧙';
+        let currentTopic = null;
+        let currentSubtopic = null;
+        
+        const AVATARS = ['🧙', '👩‍💻', '🤖', '🦸', '👾', '🚀'];
+        const GEMINI_API_KEY = "AIzaSyBe8CbokZF-iST6PYzAUEQKG-EKqmEOFMM";
+
+        const router = {
+            'loading': document.getElementById('loading-screen'),
+            'login': document.getElementById('login-screen'),
+            'signup': document.getElementById('signup-screen'),
+            'setup': document.getElementById('profile-setup-screen'),
+            'dashboard': document.getElementById('dashboard-screen'),
+            'topics': document.getElementById('topics-screen'),
+            'concept': document.getElementById('concept-screen'),
+            'multiplayer': document.getElementById('multiplayer-screen'),
+            'certificates': document.getElementById('certificates-screen'),
+            'profile': document.getElementById('profile-screen')
+        };
+
+        // Initialize Firebase
+        async function initFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                window.database = getDatabase(app);
+                database = window.database;
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        window.currentUserId = user.uid;
+                        await loadUserData(user.uid);
+                        
+                        if (!window.currentUserData.username || !window.currentUserData.avatar) {
+                            window.setView('setup');
+                        } else {
+                            window.setView('dashboard');
+                        }
+                    } else {
+                        window.currentUserId = null;
+                        window.currentUserData = {};
+                        window.setView('login');
+                    }
+                    
+                    const isPublicScreen = ['login', 'signup', 'setup', 'loading'].includes(currentView);
+                    document.getElementById('navbar').classList.toggle('hidden', isPublicScreen);
+                });
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                window.setView('login');
+            }
+        }
+
+        async function loadUserData(uid) {
+            try {
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, `users/${uid}`));
+                if (snapshot.exists()) {
+                    window.currentUserData = snapshot.val();
+                } else {
+                    window.currentUserData = { 
+                        score: 0, 
+                        concepts_completed: {}, 
+                        certificates: [],
+                        username: '', 
+                        avatar: '' 
+                    };
+                    await set(ref(database, `users/${uid}`), window.currentUserData);
+                }
+            } catch (e) {
+                console.error("Error loading user data:", e);
+                window.currentUserData = { score: 0, concepts_completed: {}, certificates: [], username: '', avatar: '' };
+            }
+        }
+
+        async function saveUserData() {
+            if (!database || !window.currentUserId) return;
+            try {
+                await set(ref(database, `users/${window.currentUserId}`), window.currentUserData);
+            } catch (e) {
+                console.error("Error saving user data:", e);
+            }
+        }
+
+        window.setView = function(viewName) {
+            currentView = viewName;
+            const isPublicScreen = ['login', 'signup', 'setup'].includes(viewName);
+            document.getElementById('navbar').classList.toggle('hidden', isPublicScreen);
+
+            Object.values(router).forEach(el => { if (el) el.classList.add('hidden'); });
+            const target = router[viewName];
+            if (target) { target.classList.remove('hidden'); }
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('nav-active');
+                if (link.dataset.view === viewName) { link.classList.add('nav-active'); }
+            });
+
+            if (viewName === 'profile') { updateProfileUI(); }
+            if (viewName === 'dashboard') { updateDashboardUI(); }
+            if (viewName === 'certificates') { loadCertificates(); }
+        };
+
+        function updateProfileUI() {
+            document.getElementById('profile-username').textContent = window.currentUserData.username || 'N/A';
+            document.getElementById('profile-avatar').textContent = window.currentUserData.avatar || '❓';
+            document.getElementById('profile-uid').textContent = window.currentUserId;
+            document.getElementById('profile-score').textContent = window.currentUserData.score || 0;
+        }
+
+        function updateDashboardUI() {
+            document.getElementById('welcome-message').textContent = 
+                `Welcome back, ${window.currentUserData.avatar || ''} ${window.currentUserData.username || 'Coder'}!`;
+        }
+
+        // Authentication
+        window.handleAuth = async (isSignup) => {
+            const email = document.getElementById(isSignup ? 'signup-email' : 'login-email').value.trim();
+            const password = document.getElementById(isSignup ? 'signup-password' : 'login-password').value;
+            const errorElement = document.getElementById(isSignup ? 'signup-error' : 'login-error');
+            
+            errorElement.textContent = '';
+            if (!email || !password) {
+                errorElement.textContent = 'Email and password are required.';
+                return;
+            }
+
+            try {
+                if (isSignup) {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                console.error('Auth error during', isSignup ? 'signup' : 'login', error);
+
+                const code = error && error.code ? error.code : '';
+                const rawMessage = error && error.message ? error.message : 'An unknown error occurred.';
+
+                let friendlyMessage = '';
+                switch (code) {
+                    case 'auth/wrong-password':
+                        friendlyMessage = 'Incorrect password. Please try again.';
+                        break;
+                    case 'auth/user-not-found':
+                        friendlyMessage = 'No account found with this email.';
+                        break;
+                    case 'auth/invalid-email':
+                        friendlyMessage = 'The email address is not valid.';
+                        break;
+                    case 'auth/too-many-requests':
+                        friendlyMessage = 'Too many failed attempts. Try again later.';
+                        break;
+                    case 'auth/network-request-failed':
+                        friendlyMessage = 'Network error. Check your internet connection.';
+                        break;
+                    case 'auth/invalid-api-key':
+                        friendlyMessage = 'Invalid Firebase API key. Check your firebaseConfig.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        friendlyMessage = 'This sign-in method is not enabled in the Firebase Console.';
+                        break;
+                    default:
+                        friendlyMessage = rawMessage.replace('Firebase: ', '');
+                }
+
+                if (errorElement) {
+                    errorElement.textContent = friendlyMessage;
+                } else {
+                    alert(friendlyMessage);
+                }
+            }
+        };
+
+        window.handleSignOut = async () => {
+            try { await signOut(auth); window.setView('login'); } catch (error) { console.error(error); }
+        };
+
+        window.selectAvatar = (avatar) => {
+            selectedAvatar = avatar;
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`avatar-${avatar}`).classList.add('selected');
+        };
+
+        window.completeProfileSetup = async () => {
+            const username = document.getElementById('setup-username').value.trim();
+            const setupError = document.getElementById('setup-error');
+            
+            if (username.length < 3) {
+                setupError.textContent = 'Username must be at least 3 characters.';
+                return;
+            }
+
+            window.currentUserData.username = username;
+            window.currentUserData.avatar = selectedAvatar;
+            await saveUserData();
+            window.setView('dashboard');
+        };
+
+        // Topic Navigation
+        window.loadTopics = async (topicId) => {
+            currentTopic = topicId;
+            const response = await fetch('data/topics-config.json');
+            const config = await response.json();
+            const topic = config.topics[topicId];
+
+            document.getElementById('topic-title').textContent = `${topic.icon} ${topic.name}`;
+            
+            const subtopicsContainer = document.getElementById('subtopics-container');
+            subtopicsContainer.innerHTML = '';
+
+            topic.subtopics.forEach(subtopic => {
+                const card = document.createElement('div');
+                card.className = 'card p-6 cursor-pointer hover:ring-2 hover:ring-purple-500 transition';
+                card.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2" style="color: ${topic.color}">${subtopic.name}</h3>
+                    <p class="text-sm text-gray-400 mb-3">${subtopic.description}</p>
+                    <span class="text-xs px-3 py-1 rounded-full bg-purple-900 text-purple-300">
+                        ${subtopic.difficulty}
+                    </span>
+                `;
+                card.onclick = () => loadConcept(topicId, subtopic);
+                subtopicsContainer.appendChild(card);
+            });
+
+            window.setView('topics');
+        };
+
+        window.loadConcept = async (topicId, subtopic) => {
+            currentSubtopic = subtopic;
+            document.getElementById('concept-title').textContent = subtopic.name;
+            document.getElementById('concept-description').textContent = subtopic.description;
+            
+            // Load video
+            const videoFrame = document.getElementById('video-tutorial');
+            const videoId = subtopic.videoBasic.split('v=')[1];
+            videoFrame.src = `https://www.youtube.com/embed/${videoId}`;
+
+            window.setView('concept');
+            showConceptTab('learn-tab');
+        };
+
+        window.showConceptTab = (tabId) => {
+            document.querySelectorAll('.concept-tab-pane').forEach(pane => pane.classList.add('hidden'));
+            document.querySelectorAll('.concept-tab-button').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`[onclick="showConceptTab('${tabId}')"]`).classList.add('active');
+
+            if (currentSubtopic) {
+                if (tabId === 'game-tab') {
+                    startPhaserGame();
+                } else if (tabId === 'code-tab') {
+                    if (window.loadCodingChallenge) {
+                        window.loadCodingChallenge(currentSubtopic.id);
+                    }
+                } else if (tabId === 'quiz-tab') {
+                    if (window.loadQuiz) {
+                        window.loadQuiz(currentSubtopic.id);
+                    }
+                }
+            }
+        };
+
+        async function startPhaserGame() {
+            const gameType = currentSubtopic.id;
+            const userData = {
+                userId: window.currentUserId,
+                username: window.currentUserData.username,
+                score: window.currentUserData.score
+            };
+
+            await window.gameManager.startGame(gameType, userData);
+        }
+
+        // Score Reporting
+        window.reportScore = async (score, concept, metrics) => {
+            window.currentUserData.score = (window.currentUserData.score || 0) + score;
+            window.currentUserData.concepts_completed[concept] = {
+                score: score,
+                metrics: metrics,
+                timestamp: Date.now()
+            };
+            await saveUserData();
+            
+            alert(`🎉 Challenge Complete! Score: ${score}\nTotal Score: ${window.currentUserData.score}`);
+            window.setView('dashboard');
+        };
+
+        // Certificates
+        async function loadCertificates() {
+            const certs = await window.certificateManager.getUserCertificates(window.currentUserId);
+            window.certificateManager.displayCertificates(certs, 'certificates-list');
+        }
+
+        window.uploadCertificate = async () => {
+            const fileInput = document.getElementById('cert-file-input');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            try {
+                document.getElementById('upload-status').textContent = 'Uploading and processing...';
+                await window.certificateManager.uploadCertificate(file, window.currentUserId);
+                document.getElementById('upload-status').textContent = '✅ Certificate uploaded successfully!';
+                fileInput.value = '';
+                setTimeout(() => {
+                    document.getElementById('upload-status').textContent = '';
+                    loadCertificates();
+                }, 2000);
+            } catch (error) {
+                document.getElementById('upload-status').textContent = '❌ Upload failed: ' + error.message;
+            }
+        };
+
+        window.searchExternalCourses = async () => {
+            const resultsDiv = document.getElementById('course-results');
+            resultsDiv.innerHTML = '<p class="text-yellow-400">🔍 Searching courses...</p>';
+
+            const topic = currentSubtopic ? currentSubtopic.name : 'Computer Science';
+            
+            const [udemyCourses, courseraCourses, certifications] = await Promise.all([
+                window.certificateManager.searchUdemyCourses(topic),
+                window.certificateManager.searchCourseraCourses(topic),
+                window.certificateManager.getRelevantCertifications(currentTopic)
+            ]);
+
+            let html = '<div class="space-y-6">';
+            
+            // Udemy Courses
+            html += '<div><h4 class="text-xl font-bold text-orange-400 mb-3">📚 Udemy Courses</h4>';
+            udemyCourses.slice(0, 3).forEach(course => {
+                html += `
+                    <div class="card p-4 mb-3">
+                        <h5 class="font-bold text-white">${course.title}</h5>
+                        <p class="text-sm text-gray-400">${course.instructor || course.description}</p>
+                        <p class="text-xs text-yellow-400 mt-2">⭐ ${course.rating || 'N/A'} | ${course.price || 'Varies'}</p>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // Coursera Courses
+            html += '<div><h4 class="text-xl font-bold text-blue-400 mb-3">🎓 Coursera Courses</h4>';
+            courseraCourses.slice(0, 3).forEach(course => {
+                html += `
+                    <div class="card p-4 mb-3">
+                        <h5 class="font-bold text-white">${course.title}</h5>
+                        <p class="text-sm text-gray-400">${course.provider} | ${course.duration}</p>
+                        <p class="text-xs text-green-400 mt-2">${course.level}</p>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // Professional Certifications
+            if (certifications.length > 0) {
+                html += '<div><h4 class="text-xl font-bold text-purple-400 mb-3">🏆 Professional Certifications</h4>';
+                certifications.forEach(cert => {
+                    html += `
+                        <div class="card p-4 mb-3">
+                            <h5 class="font-bold text-white">${cert.name}</h5>
+                            <p class="text-sm text-gray-400">${cert.provider}</p>
+                            <a href="${cert.url}" target="_blank" class="text-xs text-blue-400 hover:underline mt-2 inline-block">
+                                Learn More →
+                            </a>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
+
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        };
+
+        // Multiplayer
+        window.createMultiplayerRoom = async () => {
+            try {
+                await window.multiplayerManager.initialize(window.currentUserId);
+                const room = await window.multiplayerManager.createRoom('process-scheduling', {
+                    id: window.currentUserId,
+                    username: window.currentUserData.username,
+                    avatar: window.currentUserData.avatar
+                });
+
+                document.getElementById('room-code-display').textContent = room.id;
+                document.getElementById('room-status').textContent = 'Waiting for opponent...';
+                document.getElementById('multiplayer-lobby').classList.remove('hidden');
+            } catch (error) {
+                alert('Failed to create room: ' + error.message);
+            }
+        };
+
+        window.joinMultiplayerRoom = async () => {
+            const roomCode = document.getElementById('room-code-input').value.trim();
+            if (!roomCode) {
+                alert('Please enter a room code');
+                return;
+            }
+
+            try {
+                await window.multiplayerManager.initialize(window.currentUserId);
+                await window.multiplayerManager.joinRoom(roomCode, {
+                    id: window.currentUserId,
+                    username: window.currentUserData.username,
+                    avatar: window.currentUserData.avatar
+                });
+
+                alert('Joined room successfully!');
+            } catch (error) {
+                alert('Failed to join room: ' + error.message);
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatarContainer = document.getElementById('avatar-selection-container');
+            AVATARS.forEach(avatar => {
+                const div = document.createElement('div');
+                div.className = 'avatar-option';
+                div.id = `avatar-${avatar}`;
+                div.textContent = avatar;
+                div.setAttribute('onclick', `selectAvatar('${avatar}')`);
+                avatarContainer.appendChild(div);
+            });
+            initFirebase();
+        });
+    </script>
+
+    <!-- Load Game Scripts -->
+    <script src="js/phaser-config.js"></script>
+    <script src="js/certificate-manager.js"></script>
+    <script src="js/multiplayer-manager.js"></script>
+    <script src="js/concept-explanations.js"></script>
+    <script src="js/coding-quiz.js"></script>
+    <script src="games/os/process-scheduler.js"></script>
+    <script src="games/os/memory-manager.js"></script>
+    <script src="games/os/deadlock-game.js"></script>
+
+    <!-- Navigation Bar -->
+    <header id="navbar" class="bg-purple-900 shadow-lg p-4 flex justify-between items-center sticky top-0 z-10 hidden">
+        <h1 class="text-3xl font-bold text-white tracking-wider">CodeVerse</h1>
+        <div class="flex space-x-6">
+            <a href="#" class="nav-link nav-active" data-view="dashboard" onclick="setView('dashboard')">Home</a>
+            <a href="#" class="nav-link" data-view="certificates" onclick="setView('certificates')">Certificates</a>
+            <a href="#" class="nav-link" data-view="multiplayer" onclick="setView('multiplayer')">Multiplayer</a>
+            <a href="#" class="nav-link" data-view="profile" onclick="setView('profile')">Profile</a>
+            <button onclick="handleSignOut()" class="btn-primary px-3 py-1 rounded-full text-sm">Sign Out</button>
+        </div>
+    </header>
+
+    <main class="flex-grow p-8">
+        <!-- Loading Screen -->
+        <section id="loading-screen" class="flex items-center justify-center h-screen">
+            <p class="text-xl text-purple-400">Loading CodeVerse...</p>
+        </section>
+
+        <!-- Login Screen -->
+        <section id="login-screen" class="hidden flex items-center justify-center h-screen">
+            <div class="card p-8 w-full max-w-md">
+                <h2 class="text-3xl font-extrabold text-center text-white mb-6">Welcome to CodeVerse</h2>
+                <div class="space-y-4">
+                    <input type="email" id="login-email" placeholder="Email" class="input-field w-full p-3 rounded-lg">
+                    <input type="password" id="login-password" placeholder="Password" class="input-field w-full p-3 rounded-lg">
+                    <p id="login-error" class="text-red-400 text-sm h-4"></p>
+                    <button onclick="handleAuth(false)" class="btn-primary w-full p-3 rounded-lg font-semibold">Login</button>
+                </div>
+                <p class="mt-6 text-center text-sm text-gray-400">
+                    New here? <a href="#" onclick="setView('signup')" class="text-yellow-400 hover:underline">Create Account</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Signup Screen -->
+        <section id="signup-screen" class="hidden flex items-center justify-center h-screen">
+            <div class="card p-8 w-full max-w-md">
+                <h2 class="text-3xl font-extrabold text-center text-white mb-6">Join CodeVerse</h2>
+                <div class="space-y-4">
+                    <input type="email" id="signup-email" placeholder="Email" class="input-field w-full p-3 rounded-lg">
+                    <input type="password" id="signup-password" placeholder="Password (min 6 chars)" class="input-field w-full p-3 rounded-lg">
+                    <p id="signup-error" class="text-red-400 text-sm h-4"></p>
+                    <button onclick="handleAuth(true)" class="btn-primary w-full p-3 rounded-lg font-semibold">Sign Up</button>
+                </div>
+                <p class="mt-6 text-center text-sm text-gray-400">
+                    Already have an account? <a href="#" onclick="setView('login')" class="text-yellow-400 hover:underline">Login</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Profile Setup -->
+        <section id="profile-setup-screen" class="hidden flex items-center justify-center h-screen">
+            <div class="card p-8 w-full max-w-md text-center">
+                <h2 class="text-3xl font-extrabold text-white mb-4">Create Your Profile</h2>
+                <div id="avatar-selection-container" class="flex justify-center space-x-4 mb-6"></div>
+                <input type="text" id="setup-username" placeholder="Choose Username" class="input-field w-full p-3 rounded-lg text-center mb-4">
+                <p id="setup-error" class="text-red-400 text-sm h-4 mb-4"></p>
+                <button onclick="completeProfileSetup()" class="btn-primary w-full p-3 rounded-lg font-semibold">Enter CodeVerse</button>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboard-screen" class="hidden">
+            <h2 id="welcome-message" class="text-4xl font-extrabold mb-8 text-white">Welcome!</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div onclick="loadTopics('os')" class="topic-card card p-6 cursor-pointer">
+                    <h3 class="text-2xl font-bold text-blue-400 mb-2">💻 Operating Systems</h3>
+                    <p class="text-gray-400">Master process scheduling, memory management, and deadlock detection</p>
+                </div>
+                
+                <div onclick="loadTopics('networks')" class="topic-card card p-6 cursor-pointer">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">🌐 Computer Networks</h3>
+                    <p class="text-gray-400">Learn TCP/IP, DNS, routing protocols through interactive simulations</p>
+                </div>
+                
+                <div onclick="loadTopics('cybersec')" class="topic-card card p-6 cursor-pointer">
+                    <h3 class="text-2xl font-bold text-red-400 mb-2">🔒 Cyber Security</h3>
+                    <p class="text-gray-400">Explore encryption, SQL injection, and security best practices</p>
+                </div>
+                
+                <div onclick="loadTopics('dsa')" class="topic-card card p-6 cursor-pointer">
+                    <h3 class="text-2xl font-bold text-purple-400 mb-2">🧮 Data Structures & Algorithms</h3>
+                    <p class="text-gray-400">Practice stacks, queues, trees, and graph algorithms</p>
+                </div>
+                
+                <div onclick="loadTopics('interview')" class="topic-card card p-6 cursor-pointer">
+                    <h3 class="text-2xl font-bold text-yellow-400 mb-2">💼 Interview Prep</h3>
+                    <p class="text-gray-400">Ace coding interviews and system design questions</p>
+                </div>
+                
+                <div class="card p-6 opacity-50">
+                    <h3 class="text-2xl font-bold text-pink-400 mb-2">📝 Resume Builder</h3>
+                    <p class="text-gray-400">Coming Soon: Build professional resumes and portfolios</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Topics Screen -->
+        <section id="topics-screen" class="hidden">
+            <button onclick="setView('dashboard')" class="text-purple-400 hover:text-purple-300 mb-4">← Back to Dashboard</button>
+            <h2 id="topic-title" class="text-4xl font-bold mb-8 text-white"></h2>
+            <div id="subtopics-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Concept Screen -->
+        <section id="concept-screen" class="hidden">
+            <button onclick="setView('topics')" class="text-purple-400 hover:text-purple-300 mb-4">← Back to Topics</button>
+            <h2 id="concept-title" class="text-4xl font-bold mb-2 text-white"></h2>
+            <p id="concept-description" class="text-gray-400 mb-6"></p>
+
+            <div class="flex mb-6 border-b border-gray-600 pb-2 overflow-x-auto">
+                <button class="concept-tab-button tab-button active" onclick="showConceptTab('learn-tab')">📚 Learn</button>
+                <button class="concept-tab-button tab-button" onclick="showConceptTab('game-tab')">🎮 Game</button>
+                <button class="concept-tab-button tab-button" onclick="showConceptTab('code-tab')">💻 Code</button>
+                <button class="concept-tab-button tab-button" onclick="showConceptTab('quiz-tab')">🎯 Quiz</button>
+                <button class="concept-tab-button tab-button" onclick="showConceptTab('resources-tab')">🌐 Resources</button>
+            </div>
+
+            <div id="learn-tab" class="concept-tab-pane">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold mb-4 text-purple-400">📹 Video Tutorial</h3>
+                        <iframe id="video-tutorial" class="w-full aspect-video rounded-lg" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="card p-6 scrollable-content" style="max-height: 500px; overflow-y: auto;">
+                        <h3 class="text-xl font-bold mb-4 text-yellow-400">📚 Key Concepts</h3>
+                        <div id="concept-explanation" class="text-gray-300 space-y-4"></div>
+                    </div>
+                </div>
+                
+                <!-- Personalized AI Advisor -->
+                <div class="card p-6 mt-6">
+                    <h3 class="text-xl font-bold mb-4 text-green-400">🤖 Your AI Learning Advisor</h3>
+                    <div class="flex items-start space-x-4">
+                        <div class="text-6xl">🧙‍♂️</div>
+                        <div class="flex-grow">
+                            <div id="advisor-message" class="bg-gray-800 p-4 rounded-lg mb-4 text-gray-300">
+                                <p class="italic">Hello! I'm your personalized learning advisor. Complete a game to get customized advice!</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="advisor-language" class="input-field p-2 rounded-lg text-sm">
+                                    <option value="en">English</option>
+                                    <option value="es">Español</option>
+                                    <option value="fr">Français</option>
+                                    <option value="de">Deutsch</option>
+                                    <option value="hi">हिन्दी</option>
+                                    <option value="zh">中文</option>
+                                    <option value="ja">日本語</option>
+                                    <option value="ar">العربية</option>
+                                </select>
+                                <button onclick="getPersonalizedAdvice()" class="btn-primary px-4 py-2 rounded-lg text-sm">
+                                    Get Advice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-tab" class="concept-tab-pane hidden">
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">🎮 Interactive Game Simulation</h3>
+                    <div id="game-container" class="bg-gray-900 rounded-lg"></div>
+                </div>
+            </div>
+
+            <div id="code-tab" class="concept-tab-pane hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold mb-4 text-purple-400">💻 Coding Challenge</h3>
+                        <div id="coding-challenge-container"></div>
+                    </div>
+                    
+                    <div class="card p-6">
+                        <h3 class="text-2xl font-bold mb-4 text-green-400">🤖 AI Coding Assistant</h3>
+                        <div class="flex flex-col h-full">
+                            <div id="coding-chat-messages" class="flex-grow bg-gray-900 p-4 rounded-lg mb-4 overflow-y-auto scrollable-content" style="max-height: 400px;">
+                                <div class="mb-2">
+                                    <span class="text-green-400 font-semibold">AI Tutor:</span>
+                                    <span class="text-gray-300">Hi! I'm here to help with your code. Ask me anything!</span>
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <input 
+                                    id="coding-chat-input" 
+                                    type="text" 
+                                    placeholder="Ask about your code..." 
+                                    class="input-field flex-grow p-3 rounded-lg"
+                                    onkeydown="if(event.key === 'Enter') handleCodingChatbot()"
+                                >
+                                <button onclick="handleCodingChatbot()" class="btn-primary px-6 py-3 rounded-lg">
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-tab" class="concept-tab-pane hidden">
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-6 text-yellow-400">🎯 Knowledge Quiz</h3>
+                    <div id="quiz-container"></div>
+                </div>
+            </div>
+
+            <div id="resources-tab" class="concept-tab-pane hidden">
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4 text-orange-400">🌐 External Courses & Certifications</h3>
+                    <button onclick="searchExternalCourses()" class="btn-primary px-6 py-3 rounded-lg mb-6">
+                        🔍 Find Relevant Courses
+                    </button>
+                    <div id="course-results" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificates Screen -->
+        <section id="certificates-screen" class="hidden">
+            <h2 class="text-4xl font-bold mb-8 text-white">📜 My Certificates</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 text-purple-400">📤 Upload Certificate</h3>
+                    <input type="file" id="cert-file-input" accept="image/*,.pdf" class="input-field w-full p-2 rounded-lg mb-4">
+                    <button onclick="uploadCertificate()" class="btn-primary w-full p-3 rounded-lg">Upload</button>
+                    <p id="upload-status" class="text-sm text-gray-400 mt-2"></p>
+                </div>
+                
+                <div class="card p-6 col-span-2">
+                    <h3 class="text-xl font-bold mb-4 text-yellow-400">ℹ️ How It Works</h3>
+                    <ul class="text-gray-300 space-y-2 text-sm">
+                        <li>✓ Upload certificates from Udemy, Coursera, edX, or any platform</li>
+                        <li>✓ AI automatically extracts course name, date, and platform</li>
+                        <li>✓ Certificates are stored securely in your profile</li>
+                        <li>✓ Display your achievements on your dashboard</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-2xl font-bold mb-6 text-green-400">Your Certificates</h3>
+                <div id="certificates-list"></div>
+            </div>
+        </section>
+
+        <!-- Multiplayer Screen -->
+        <section id="multiplayer-screen" class="hidden">
+            <h2 class="text-4xl font-bold mb-8 text-white">👥 Multiplayer Mode</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">🎮 Create Room</h3>
+                    <p class="text-gray-400 mb-4">Host a game and invite a friend to compete!</p>
+                    <button onclick="createMultiplayerRoom()" class="btn-primary w-full p-3 rounded-lg">
+                        Create Room
+                    </button>
+                    
+                    <div id="multiplayer-lobby" class="hidden mt-6">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <p class="text-sm text-gray-400 mb-2">Room Code:</p>
+                            <p id="room-code-display" class="text-2xl font-mono text-yellow-400 mb-4"></p>
+                            <p id="room-status" class="text-sm text-gray-400"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4 text-blue-400">🔗 Join Room</h3>
+                    <p class="text-gray-400 mb-4">Enter a room code to join a friend's game</p>
+                    <input type="text" id="room-code-input" placeholder="Enter Room Code" 
+                           class="input-field w-full p-3 rounded-lg mb-4">
+                    <button onclick="joinMultiplayerRoom()" class="btn-primary w-full p-3 rounded-lg">
+                        Join Room
+                    </button>
+                </div>
+            </div>
+
+            <div class="card p-6 mt-6">
+                <h3 class="text-xl font-bold mb-4 text-purple-400">ℹ️ How Multiplayer Works</h3>
+                <ul class="text-gray-300 space-y-2">
+                    <li>✓ Peer-to-peer connection using WebRTC (no server needed)</li>
+                    <li>✓ Real-time game synchronization</li>
+                    <li>✓ Compete on the same challenge simultaneously</li>
+                    <li>✓ First to complete wins bonus points</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Profile Screen -->
+        <section id="profile-screen" class="hidden">
+            <h2 class="text-4xl font-bold mb-8 text-white">👤 Your Profile</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-8">
+                    <div class="text-center mb-6">
+                        <p class="text-8xl mb-4" id="profile-avatar">❓</p>
+                        <h3 class="text-2xl font-bold text-white" id="profile-username">Loading...</h3>
+                        <p class="text-sm text-gray-400" id="profile-uid">ID: ...</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Total Score:</span>
+                            <span class="text-yellow-400 font-bold" id="profile-score">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Concepts Completed:</span>
+                            <span class="text-green-400 font-bold">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Certificates:</span>
+                            <span class="text-purple-400 font-bold">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-purple-400">🏆 Achievements</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-green-900/40 p-4 rounded-lg text-center">
+                            <p class="text-3xl mb-2">🎯</p>
+                            <p class="text-sm text-gray-300">First Steps</p>
+                        </div>
+                        <div class="bg-blue-900/40 p-4 rounded-lg text-center">
+                            <p class="text-3xl mb-2">💻</p>
+                            <p class="text-sm text-gray-300">OS Master</p>
+                        </div>
+                        <div class="bg-purple-900/40 p-4 rounded-lg text-center opacity-50">
+                            <p class="text-3xl mb-2">🔒</p>
+                            <p class="text-sm text-gray-300">Security Pro</p>
+                        </div>
+                        <div class="bg-yellow-900/40 p-4 rounded-lg text-center opacity-50">
+                            <p class="text-3xl mb-2">🌐</p>
+                            <p class="text-sm text-gray-300">Network Ninja</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-purple-900 text-center p-4 text-gray-300">
+        <p>&copy; 2024 CodeVerse - Master Computer Science Through Interactive Learning</p>
+    </footer>
+</body>
+</html>

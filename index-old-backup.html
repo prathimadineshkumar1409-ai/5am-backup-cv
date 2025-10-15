@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeVerse: The Logic Forge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles for CodeVerse Theme */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #1e1e3f; color: #f0f0f0; }
+        .card { background-color: #2c2c54; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); }
+        .btn-primary { background-color: #7b3fe8; color: white; transition: background-color 0.2s; }
+        .btn-primary:hover { background-color: #6333c9; }
+        .input-field { border: 1px solid #4a4a7a; background-color: #1a1a3a; color: #f0f0f0; }
+        .nav-link { color: #bdbdff; border-bottom: 2px solid transparent; transition: border-bottom 0.2s; }
+        .nav-link:hover, .nav-active { border-bottom: 2px solid #a3b0ff; color: white; }
+        .tab-button {
+            padding: 8px 16px; margin-right: 8px; border-radius: 8px;
+            background-color: #3a3a6a; color: #bdbdff; cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .tab-button:hover { background-color: #4a4a7a; }
+        .tab-button.active { background-color: #a3b0ff; color: #1e1e3f; font-weight: bold; }
+        .scrollable-content::-webkit-scrollbar { width: 8px; }
+        .scrollable-content::-webkit-scrollbar-track { background: #1a1a3a; }
+        .scrollable-content::-webkit-scrollbar-thumb { background: #7b3fe8; border-radius: 4px; }
+        
+        .avatar-option {
+            width: 60px; height: 60px; font-size: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid transparent; border-radius: 50%; cursor: pointer;
+            transition: all 0.15s;
+        }
+        .avatar-option.selected { border-color: #a3b0ff; background-color: #3a3a6a; transform: scale(1.1); }
+        
+        #twine-mentor-frame { min-height: 400px; }
+        .chat-message { padding: 4px 0; }
+        .chat-user { color: #a3b0ff; }
+        .chat-tutor { color: #fcc419; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Firebase Imports and Setup Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        
+        // --- MANDATORY GLOBAL VARIABLES ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // Firebase Configuration - Replace with your actual config
+        const firebaseConfig = {
+            apiKey: "AIzaSyA92E7a67gbSmNCN5w_f65vMq4NNHbWuAA",
+            authDomain: "codeverse-80575.firebaseapp.com",
+            projectId: "codeverse-80575",
+            storageBucket: "codeverse-80575.firebasestorage.app",
+            messagingSenderId: "586270087321",
+            appId: "1:586270087321:web:c1b159d173173206844008",
+            measurementId: "G-G5QFP52K2G"
+        };
+        
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- GLOBAL STATE ---
+        let app, database, auth;
+        let currentUserId = null;
+        let currentUserData = {};
+        let currentView = 'loading';
+        let authReady = false;
+        let selectedAvatar = '🧙';
+        let latestQuizScore = 50; 
+        
+        // AVATARS List (FIXED: defined in module scope)
+        const AVATARS = ['🧙', '👩‍💻', '🤖', '🦸', '👾', '🚀']; 
+        
+        const GEMINI_MODEL = "gemini-2.0-flash-exp";
+        const apiKey = "AIzaSyBe8CbokZF-iST6PYzAUEQKG-EKqmEOFMM"; // Gemini API Key
+
+        const router = {
+            'loading': document.getElementById('loading-screen'),
+            'login': document.getElementById('login-screen'),
+            'signup': document.getElementById('signup-screen'),
+            'setup': document.getElementById('profile-setup-screen'),
+            'dashboard': document.getElementById('dashboard-screen'),
+            'concept': document.getElementById('concept-screen'),
+            'profile': document.getElementById('profile-screen'),
+            'leaderboard': document.getElementById('leaderboard-screen')
+        };
+        
+        // --- CORE FIREBASE & UI FUNCTIONS ---
+        async function initFirebase() { 
+            try {
+                console.log("Initializing Firebase...");
+                
+                // Validate Firebase config
+                if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+                    throw new Error("Firebase configuration is incomplete. Please check your config.");
+                }
+                
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                database = getDatabase(app);
+                
+                console.log("Firebase and Realtime Database initialized successfully");
+
+                // Set up auth state listener first
+                onAuthStateChanged(auth, async (user) => {
+                    console.log("Auth state changed:", user ? `User: ${user.uid}` : "No user");
+                    
+                    if (user) {
+                        currentUserId = user.uid;
+                        await loadUserData(currentUserId);
+                        
+                        // Navigate based on profile completion
+                        if (!currentUserData.username || !currentUserData.avatar) {
+                            console.log("Profile incomplete, showing setup");
+                            window.setView('setup');
+                        } else {
+                            console.log("Profile complete, showing dashboard");
+                            window.setView('dashboard');
+                        }
+                    } else {
+                        currentUserId = null;
+                        currentUserData = {};
+                        console.log("No user, showing login");
+                        window.setView('login');
+                    }
+                    
+                    authReady = true;
+                    
+                    // Hide navbar for public screens
+                    const isPublicScreen = ['login', 'signup', 'setup', 'loading'].includes(currentView);
+                    document.getElementById('navbar').classList.toggle('hidden', isPublicScreen);
+                });
+
+                // Note: We don't auto-sign in anymore - let users choose to login or signup
+                console.log("Auth listener set up, waiting for user action");
+                
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                authReady = true;
+                
+                // Show error to user
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'fixed top-4 right-4 bg-red-600 text-white p-4 rounded-lg shadow-lg z-50';
+                errorMsg.innerHTML = `
+                    <strong>Firebase Error:</strong><br>
+                    ${error.message}<br>
+                    <small>Check console for details</small>
+                `;
+                document.body.appendChild(errorMsg);
+                
+                setTimeout(() => errorMsg.remove(), 5000);
+                window.setView('login');
+            }
+        }
+        
+        async function loadUserData(uid) {
+            if (!database || !uid) return;
+            try {
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, `users/${uid}`));
+                if (snapshot.exists()) {
+                    currentUserData = snapshot.val();
+                    console.log("User data loaded:", currentUserData);
+                } else {
+                    currentUserData = { score: 0, concepts_completed: {}, username: '', avatar: '' };
+                    await set(ref(database, `users/${uid}`), currentUserData);
+                    console.log("New user data created");
+                }
+            } catch (e) { 
+                console.error("Error loading user data:", e); 
+                currentUserData = { score: 0, concepts_completed: {}, username: '', avatar: '' };
+            }
+        }
+        
+        async function saveUserData() {
+            if (!database || !currentUserId) return;
+            try {
+                await set(ref(database, `users/${currentUserId}`), currentUserData);
+                console.log("User data saved successfully:", currentUserData);
+            } catch (e) { 
+                console.error("Error saving user data:", e); 
+            }
+        }
+        
+        window.setView = function(viewName) {
+            currentView = viewName;
+            
+            const isPublicScreen = ['login', 'signup', 'setup'].includes(viewName);
+            document.getElementById('navbar').classList.toggle('hidden', isPublicScreen);
+
+            Object.values(router).forEach(el => { if (el) el.classList.add('hidden'); });
+            const target = router[viewName];
+            if (target) { target.classList.remove('hidden'); }
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('nav-active');
+                if (link.dataset.view === viewName) { link.classList.add('nav-active'); }
+            });
+
+            if (viewName === 'profile') { updateProfileUI(); }
+            if (viewName === 'dashboard') { updateDashboardUI(); }
+            if (viewName === 'concept') { 
+                // Load Twine iframe when entering concept view
+                const iframe = document.getElementById('twine-mentor-frame');
+                if (iframe.src === "") { iframe.src = 'mentor_story.html'; }
+                // Start dialogue after iframe content is confirmed loaded
+                iframe.onload = () => { startTwineDialogue(); };
+            }
+        }
+        
+        function updateProfileUI() {
+            if (!currentUserId) return;
+            document.getElementById('profile-username').textContent = currentUserData.username || 'N/A';
+            document.getElementById('profile-avatar').textContent = currentUserData.avatar || '❓';
+            document.getElementById('profile-uid').textContent = currentUserId;
+            document.getElementById('profile-score').textContent = currentUserData.score || 0;
+        }
+        
+        function updateDashboardUI() {
+            document.getElementById('welcome-message').textContent = `Welcome, ${currentUserData.avatar || ''} ${currentUserData.username || 'Coder'}!`;
+        }
+
+        // --- HANDLER FUNCTIONS ---
+        window.handleAuth = async (isSignup) => {
+            const email = document.getElementById(isSignup ? 'signup-email' : 'login-email').value.trim();
+            const password = document.getElementById(isSignup ? 'signup-password' : 'login-password').value;
+            const errorElement = document.getElementById(isSignup ? 'signup-error' : 'login-error');
+            const button = event.target;
+            
+            errorElement.textContent = '';
+
+            if (!email || !password) { 
+                errorElement.textContent = 'Email and password are required.'; 
+                return; 
+            }
+            
+            if (password.length < 6) {
+                errorElement.textContent = 'Password must be at least 6 characters.';
+                return;
+            }
+
+            // Disable button and show loading
+            button.disabled = true;
+            button.textContent = isSignup ? 'Creating Account...' : 'Logging In...';
+
+            try {
+                console.log(`Attempting ${isSignup ? 'signup' : 'login'} for:`, email);
+                
+                if (isSignup) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    console.log("Signup successful:", userCredential.user.uid);
+                    currentUserId = userCredential.user.uid;
+                    await loadUserData(currentUserId);
+                    // Auth state listener will handle navigation to setup
+                } else {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    console.log("Login successful:", userCredential.user.uid);
+                    currentUserId = userCredential.user.uid;
+                    await loadUserData(currentUserId);
+                    // Auth state listener will handle navigation
+                }
+            } catch (error) {
+                console.error(isSignup ? 'Signup Error:' : 'Login Error:', error);
+                
+                // User-friendly error messages
+                let errorMsg = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg = 'This email is already registered. Please login instead.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMsg = 'Invalid email address format.';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMsg = 'Password is too weak. Use at least 6 characters.';
+                } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMsg = 'Invalid email or password.';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMsg = 'Invalid credentials. Please check your email and password.';
+                } else {
+                    errorMsg = error.message.replace('Firebase: ', '').replace(/\(.*\)/, '');
+                }
+                
+                errorElement.textContent = errorMsg;
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = isSignup ? 'Sign Up' : 'Login';
+            }
+        };
+
+        window.handleSignOut = async () => {
+            try { await signOut(auth); window.setView('login'); } catch (error) { console.error('Sign Out Error:', error); }
+        };
+        
+        window.selectAvatar = (avatar) => {
+            selectedAvatar = avatar;
+            document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`avatar-${avatar}`).classList.add('selected');
+        };
+
+        // Profile Setup Logic
+        window.completeProfileSetup = async () => {
+            const usernameInput = document.getElementById('setup-username');
+            const username = usernameInput.value.trim();
+            const setupError = document.getElementById('setup-error');
+            setupError.textContent = '';
+
+            if (username.length < 3) { setupError.textContent = 'Username must be at least 3 characters.'; return; }
+            if (!selectedAvatar) { setupError.textContent = 'Please select an avatar.'; return; }
+
+            currentUserData.username = username;
+            currentUserData.avatar = selectedAvatar;
+            await saveUserData();
+            window.setView('dashboard');
+        };
+
+        window.navigateTo = (viewName, conceptId = null) => {
+            if (conceptId) { document.getElementById('concept-title').textContent = conceptId; }
+            window.setView(viewName);
+        };
+        
+        // --- GODOT GAME BRIDGE FUNCTIONS ---
+
+        /**
+         * @function startGodotLevel
+         * Initiates the Godot game simulation (loads the WebAssembly module) 
+         * and sends it initial data (like the concept ID or current score).
+         * @param {string} conceptId - The DSA concept to load (e.g., 'Stack', 'Queue').
+         */
+        window.startGodotLevel = (conceptId) => {
+            const gameContainer = document.getElementById('godot-game-container');
+            
+            // Check if game is already loaded to prevent duplicate iframes
+            if (gameContainer.querySelector('iframe')) {
+                console.warn("Godot game is already running. Restarting level.");
+                // In a real app, we would send a message to the existing iframe to reset the game.
+                // For this prototype, we'll remove the old and load new for simplicity.
+                gameContainer.querySelector('iframe').remove();
+            }
+
+            const godotIframe = document.createElement('iframe');
+            
+            // The iframe points to the folder where you will export your Godot project.
+            // Ensure you export the Godot project into a subfolder named 'godot_game' 
+            // inside your CodeVerse folder.
+            godotIframe.src = './godot_game/index.html'; // Use the exported index.html loader
+            godotIframe.id = 'godot-iframe';
+            godotIframe.className = 'w-full h-full bg-gray-900 border-none rounded-lg shadow-xl';
+            
+            gameContainer.innerHTML = '<p class="text-center text-gray-500 p-8">Loading The Logic Forge...</p>';
+            gameContainer.appendChild(godotIframe);
+
+            godotIframe.onload = () => {
+                console.log("Godot iframe loaded. Attempting to send initial data.");
+                
+                // Data payload sent to the Godot game
+                const initialData = {
+                    userId: currentUserId,
+                    username: currentUserData.username,
+                    concept: conceptId,
+                    difficulty: 'Beginner' // Can be customized based on profile progress
+                };
+                
+                // This sends the data to the Godot game's window, where the GDScript 
+                // needs to listen for it via JavaScript.
+                godotIframe.contentWindow.postMessage(initialData, '*'); 
+            };
+        };
+
+        /**
+         * @function reportScore
+         * This function is called *BY* the Godot game (via the JavaScript bridge) 
+         * when the user completes a simulation or challenge.
+         * This is a GLOBAL function (defined on window) that Godot's GDScript calls.
+         * @param {number} score - The score received from the game (e.g., 150).
+         * @param {string} concept - The DSA concept completed (e.g., 'Stack').
+         */
+        window.reportScore = async (score, concept) => {
+            console.log(`Score reported from Godot game: ${score} for ${concept}`);
+            
+            if (currentUserId) {
+                // 1. Update user's total score and progress
+                currentUserData.score = (currentUserData.score || 0) + score;
+                
+                // Mark concept as completed/mastered
+                currentUserData.concepts_completed[concept] = { 
+                    score: score, 
+                    timestamp: Date.now() 
+                };
+                
+                await saveUserData();
+                
+                // 2. Clear the game view
+                document.getElementById('godot-game-container').innerHTML = '';
+
+                // 3. Trigger the adaptive mentor dialogue based on the score
+                latestQuizScore = score; 
+                
+                // Show a temporary success message before redirecting
+                alert(`CHALLENGE COMPLETE! Score: ${score}. Progress Saved!`); 
+                
+                // Redirect back to the learning path or dashboard
+                window.navigateTo('dashboard');
+            } else {
+                console.error("Cannot save score: User is not authenticated.");
+            }
+        };
+
+        // Update the concept tab handler to use the new Godot function
+        window.showConceptTab = (tabId) => {
+            document.querySelectorAll('.tab-pane').forEach(pane => { pane.classList.add('hidden'); });
+            document.querySelectorAll('.tab-button').forEach(button => { button.classList.remove('active'); });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`[onclick="showConceptTab('${tabId}')"]`).classList.add('active');
+
+            // Automatically start the Godot game when the game tab is opened
+            if (tabId === 'game-tab') {
+                const concept = document.getElementById('concept-title').textContent;
+                // Call the new bridge function
+                startGodotLevel(concept); 
+            }
+        };
+
+        // --- GEMINI/TWINE ADAPTIVE DIALOGUE INTEGRATION ---
+        
+        window.simulateGeminiAdvice = async (score, concept) => {
+            const currentConcept = concept || "Stack";
+            let status;
+            
+            if (score >= 80) { status = "Master"; } 
+            else if (score >= 50) { status = "Balanced"; } 
+            else { status = "Struggling"; }
+            
+            const systemPrompt = `You are The Logic Sage, an encouraging, yet challenging, mentor in the CodeVerse game. The user has just finished a quiz on the concept of ${currentConcept} with a score of ${score}/100. Generate a short, 1-2 sentence piece of advice tailored to their performance status: ${status}. Use friendly, game-like language. For 'Struggling,' focus on revisiting the core rule (LIFO/FIFO). For 'Master,' suggest the next hard topic (e.g., overflows/efficiency).`;
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: `Generate adaptive advice based on the quiz result.` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            let advice = `Mentor is thinking... (Status: ${status})`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                advice = result.candidates?.[0]?.content?.parts?.[0]?.text || advice;
+            } catch (error) {
+                console.error("Gemini API call failed:", error);
+                advice = "The ancient connection is weak. Try again later, young Coder.";
+            }
+
+            return { status, advice };
+        };
+
+        window.startTwineDialogue = async () => {
+            const iframe = document.getElementById('twine-mentor-frame');
+            
+            if (iframe.contentWindow && iframe.contentWindow.startStory) {
+                const concept = document.getElementById('concept-title').textContent;
+                const score = latestQuizScore; 
+
+                iframe.contentWindow.startStory(score, "Loading", "The Logic Sage is consulting the Code Oracle...");
+
+                const { status, advice } = await simulateGeminiAdvice(score, concept);
+                
+                iframe.contentWindow.startStory(score, status, advice);
+                
+                // Cycle the mock score for demonstration of adaptive dialogue
+                latestQuizScore = (latestQuizScore + 25) % 101; 
+            } else {
+                console.warn("Twine iframe content is not loaded or bridge function is missing.");
+            }
+        };
+
+        // --- GEMINI CHATBOT INTEGRATION ---
+
+        window.handleChatbotQuery = async () => {
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const userQuery = chatInput.value.trim();
+            chatInput.value = ''; 
+            
+            if (!userQuery) return;
+
+            chatMessages.innerHTML += `<div class="chat-message chat-user">You: ${userQuery}</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const loadingMsg = document.createElement('div');
+            loadingMsg.className = 'chat-message chat-tutor';
+            loadingMsg.innerHTML = 'Tutor: ✨ Thinking...';
+            chatMessages.appendChild(loadingMsg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const concept = document.getElementById('concept-title').textContent;
+            const currentCode = document.getElementById('coding-challenge-textarea').value;
+            
+            const systemPrompt = `You are the CodeVerse AI Tutor, specializing in Data Structures. You must be helpful, concise, and educational. The user is currently working on the ${concept} coding challenge in JavaScript. DO NOT give the complete solution. If the user asks for a solution, only provide a small, relevant code snippet or a conceptual hint. If they provide code, analyze their code (enclosed in triple backticks below) and pinpoint the likely error or misconception (related to the DSA concept) and suggest a fix.`;
+
+            const userPrompt = `The user's code is:\n\n\`\`\`javascript\n${currentCode}\n\`\`\`\n\nUser Question: ${userQuery}`;
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                const tutorResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't process that request right now.";
+                
+                loadingMsg.innerHTML = `Tutor: ${tutorResponse}`;
+            } catch (error) {
+                console.error("Chatbot API call failed:", error);
+                loadingMsg.innerHTML = `Tutor: Error communicating with the Oracle. (API failed)`;
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        // --- GEMINI EXTERNAL RESOURCE SEARCH INTEGRATION ---
+        
+        window.searchExternalResources = async () => {
+            const resultsContainer = document.getElementById('udemy-results');
+            const concept = document.getElementById('concept-title').textContent;
+            
+            resultsContainer.innerHTML = '<p class="text-yellow-400 mt-4">✨ Consulting external knowledge base...</p>';
+            
+            const systemPrompt = `You are a career counselor specializing in Computer Science certifications. For the user's current topic (${concept}), find the most relevant, highly-rated Udemy courses and suggest one widely recognized external professional certification/exam related to this topic (e.g., AWS, Microsoft, specific programming certification). Format your response as an ordered Markdown list.`;
+
+            const userQuery = `Find top 3 Udemy courses and one professional certification for ${concept}.`;
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ "google_search": {} }], 
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                let markdownContent = result.candidates?.[0]?.content?.parts?.[0]?.text || 'No external results found.';
+                
+                // Simple Markdown to HTML conversion for display
+                markdownContent = markdownContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                markdownContent = markdownContent.replace(/^- (.*)/gm, '<li>$1</li>');
+                markdownContent = markdownContent.replace(/^(\d+\. )(.*)/gm, '<li>$2</li>');
+                markdownContent = `<ul class="list-disc pl-5 space-y-2 text-gray-300">${markdownContent}</ul>`;
+
+                resultsContainer.innerHTML = `<h4 class="text-xl font-semibold text-purple-300 mb-2">Relevant Learning Paths:</h4>${markdownContent}`;
+
+            } catch (error) {
+                console.error("External Search API call failed:", error);
+                resultsContainer.innerHTML = '<p class="text-red-400 mt-4">Error accessing external resources. Please check connection.</p>';
+            }
+        };
+
+
+        // Start initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatarContainer = document.getElementById('avatar-selection-container');
+            AVATARS.forEach(avatar => {
+                const div = document.createElement('div');
+                div.className = 'avatar-option';
+                div.id = `avatar-${avatar}`;
+                div.textContent = avatar;
+                div.setAttribute('onclick', `selectAvatar('${avatar}')`);
+                avatarContainer.appendChild(div);
+            });
+            initFirebase();
+        });
+    </script>
+
+    <!-- Main Navigation Bar -->
+    <header id="navbar" class="bg-purple-900 shadow-lg p-4 flex justify-between items-center sticky top-0 z-10 hidden">
+        <h1 class="text-3xl font-bold text-white tracking-wider">CodeVerse</h1>
+        <div id="nav-links" class="flex space-x-6">
+            <a href="#" class="nav-link nav-active" data-view="dashboard" onclick="navigateTo('dashboard')">Home</a>
+            <a href="#" class="nav-link" data-view="leaderboard" onclick="navigateTo('leaderboard')">Leaderboard</a>
+            <a href="#" class="nav-link" data-view="profile" onclick="navigateTo('profile')">Profile</a>
+            <button onclick="handleSignOut()" class="btn-primary px-3 py-1 rounded-full text-sm">Sign Out</button>
+        </div>
+    </header>
+
+    <!-- Content Container -->
+    <main class="flex-grow p-8">
+
+        <!-- --- 0. Loading Screen (Initial state) --- -->
+        <section id="loading-screen" class="min-h-full flex items-center justify-center h-screen">
+            <p class="text-xl text-purple-400">Loading CodeVerse...</p>
+        </section>
+
+        <!-- --- 1. Login Screen --- -->
+        <section id="login-screen" class="hidden flex items-center justify-center h-screen">
+            <div class="card p-8 w-full max-w-md">
+                <h2 class="text-3xl font-extrabold text-center text-white mb-6">Welcome Back to The Logic Forge</h2>
+                <div class="space-y-4">
+                    <input type="email" id="login-email" placeholder="Email" class="input-field w-full p-3 rounded-lg">
+                    <input type="password" id="login-password" placeholder="Password" class="input-field w-full p-3 rounded-lg">
+                    <p id="login-error" class="text-red-400 text-sm h-4"></p>
+                    <button onclick="handleAuth(false)" class="btn-primary w-full p-3 rounded-lg font-semibold">Login</button>
+                </div>
+                <p class="mt-6 text-center text-sm text-gray-400">
+                    New to CodeVerse? <a href="#" onclick="setView('signup')" class="text-yellow-400 hover:underline">Create an Account</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- --- 2. Signup Screen --- -->
+        <section id="signup-screen" class="hidden flex items-center justify-center h-screen">
+            <div class="card p-8 w-full max-w-md">
+                <h2 class="text-3xl font-extrabold text-center text-white mb-6">Create Your CodeVerse Account</h2>
+                <div class="space-y-4">
+                    <input type="email" id="signup-email" placeholder="Email" class="input-field w-full p-3 rounded-lg">
+                    <input type="password" id="signup-password" placeholder="Password" class="input-field w-full p-3 rounded-lg">
+                    <p id="signup-error" class="text-red-400 text-sm h-4"></p>
+                    <button onclick="handleAuth(true)" class="btn-primary w-full p-3 rounded-lg font-semibold">Sign Up</button>
+                </div>
+                <p class="mt-6 text-center text-sm text-gray-400">
+                    Already have an account? <a href="#" onclick="setView('login')" class="text-yellow-400 hover:underline">Login here</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- --- 3. Profile Setup Screen (Name and Avatar Selection) --- -->
+        <section id="profile-setup-screen" class="hidden flex items-center justify-center h-screen">
+            <div class="card p-8 w-full max-w-md text-center">
+                <h2 class="text-3xl font-extrabold text-white mb-4">Forge Your Identity</h2>
+                <p class="text-gray-400 mb-8">Choose a name and an avatar to begin your adventure in CodeVerse.</p>
+                
+                <div id="avatar-selection-container" class="flex justify-center space-x-4 mb-6">
+                    <!-- Avatars populated by JS -->
+                </div>
+
+                <div class="space-y-4">
+                    <input type="text" id="setup-username" placeholder="Choose Your Coder Name" class="input-field w-full p-3 rounded-lg text-center font-semibold">
+                    <p id="setup-error" class="text-red-400 text-sm h-4"></p>
+                    <button onclick="completeProfileSetup()" class="btn-primary w-full p-3 rounded-lg font-semibold">Enter CodeVerse</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- 4. Dashboard Screen (Home Page) --- -->
+        <section id="dashboard-screen" class="hidden">
+            <h2 id="welcome-message" class="text-4xl font-extrabold mb-8 text-white">Welcome!</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- DSA Module -->
+                <div onclick="navigateTo('concept', 'DSA: Stacks')" class="card p-6 cursor-pointer hover:ring-2 hover:ring-purple-500 transition duration-150">
+                    <h3 class="text-2xl font-bold text-purple-400 mb-2">Data Structures & Algos</h3>
+                    <p class="text-gray-400">The core of CodeVerse. Master Stacks, Queues, Trees, and Graphs through interactive games.</p>
+                </div>
+                <!-- CS Basics Module -->
+                <div class="card p-6 opacity-50 cursor-not-allowed">
+                    <h3 class="text-2xl font-bold text-yellow-400 mb-2">CS Fundamentals</h3>
+                    <p class="text-gray-400">Coming Soon: Bits, Logic Gates, and Binary Operations.</p>
+                </div>
+                <!-- Networks Module -->
+                <div class="card p-6 opacity-50 cursor-not-allowed">
+                    <h3 class="text-2xl font-bold text-red-400 mb-2">Computer Networks</h3>
+                    <p class="text-gray-400">Coming Soon: TCP/IP Stack simulation and routing challenges.</p>
+                </div>
+                <!-- Interview Prep Module -->
+                <div class="card p-6 opacity-50 cursor-not-allowed">
+                    <h3 class="text-2xl font-bold text-green-400 mb-2">Interview Prep</h3>
+                    <p class="text-gray-400">Coming Soon: Targeted practice and problem-solving strategies.</p>
+                </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- 5. Concept Screen (DSA > Stacks) --- -->
+        <section id="concept-screen" class="hidden">
+            <h2 class="text-4xl font-bold mb-4 text-white">Concept: <span id="concept-title">DSA</span></h2>
+            
+            <!-- Tab Navigation for Concept -->
+            <div class="flex mb-6 border-b border-gray-600 pb-2">
+                <button class="tab-button active" onclick="showConceptTab('learn-vid-tab')">Learn & Mentor</button>
+                <button class="tab-button" onclick="showConceptTab('game-tab')">Game Simulation (Godot)</button>
+                <button class="tab-button" onclick="showConceptTab('code-tab')">Code & Chatbot</button>
+                <button class="tab-button" onclick="showConceptTab('quiz-tab')">Quiz</button>
+                <button class="tab-button" onclick="showConceptTab('udemy-tab')">Resources</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="concept-content">
+                <!-- 5.1 Learn & Video Tab (Twine Integration Target) -->
+                <div id="learn-vid-tab" class="tab-pane card p-6">
+                    <h3 class="text-2xl font-bold text-purple-400 mb-4">Stack Basics: The LIFO Principle</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="scrollable-content h-[400px] overflow-y-auto">
+                            <!-- TWINE MENTOR IFRAME -->
+                            <iframe id="twine-mentor-frame" src="mentor_story.html" class="w-full h-full bg-transparent border-none"></iframe>
+                        </div>
+                        <div class="aspect-video bg-gray-800 rounded-lg flex flex-col items-center justify-center p-4">
+                            <h4 class="text-lg font-semibold text-white mb-2">Concept Video: Basics to Advanced</h4>
+                            <p class="text-gray-500 text-sm">Placeholder for YouTube/Video Embed</p>
+                        </div>
+                    </div>
+                    <!-- TEST BUTTON: Simulates a quiz result to trigger adaptive dialogue -->
+                    <button class="btn-primary mt-6 p-2 rounded-lg" onclick="startTwineDialogue()">✨ Simulate Quiz Result & Get Mentor Advice</button>
+                </div>
+
+                <!-- 5.2 Game Simulation Tab (Godot Integration Target) -->
+                <div id="game-tab" class="tab-pane hidden card p-6 text-center">
+                    <h3 class="text-2xl font-bold text-green-400 mb-4">Stack Chamber Simulation (Godot)</h3>
+                    <div id="godot-game-container" class="w-full h-[500px] bg-gray-900 rounded-lg flex items-center justify-center">
+                        <p class="text-gray-500">**GODOT GAME EMBED:** The Godot WebAssembly module will be loaded here when ready.</p>
+                    </div>
+                </div>
+
+                <!-- 5.3 Code & Chatbot Tab -->
+                <div id="code-tab" class="tab-pane hidden card p-6">
+                    <h3 class="text-2xl font-bold text-red-400 mb-4">Coding Challenge & AI Tutor</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Write Your Solution (JavaScript)</h4>
+                            <textarea id="coding-challenge-textarea" class="w-full h-64 input-field p-3 rounded-lg text-sm" placeholder="// Implement your Stack class (push, pop, peek) here...">
+class Stack {
+  constructor() {
+    this.items = []; // This should hold the stack elements
+  }
+  push(element) {
+    // Problem: forgot to check for overflow
+    this.items.pop(element); 
+  }
+  pop() {
+    return this.items.pop();
+  }
+  peek() {
+    return this.items[this.items.length - 1];
+  }
+}
+                            </textarea>
+                            <button class="btn-primary mt-3 p-2 rounded-lg">Run Code & Test</button>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2">Context-Aware Chatbot ✨</h4>
+                            <div id="chatbot-container" class="w-full h-64 card p-3 flex flex-col justify-between">
+                                <div id="chat-messages" class="flex-grow scrollable-content overflow-y-auto mb-2 text-sm">
+                                    <p class="chat-message chat-tutor">Tutor: Ready to assist with your Stack code or JavaScript syntax!</p>
+                                </div>
+                                <div class="flex">
+                                    <input id="chat-input" type="text" placeholder="Ask for a specific hint..." class="input-field flex-grow p-2 rounded-l-lg text-sm" onkeydown="if(event.key === 'Enter') handleChatbotQuery()">
+                                    <button onclick="handleChatbotQuery()" class="btn-primary p-2 rounded-r-lg">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5.4 Quiz Tab -->
+                <div id="quiz-tab" class="tab-pane hidden card p-6">
+                    <h3 class="text-2xl font-bold text-yellow-400 mb-4">Knowledge Quiz: Stack Mastery</h3>
+                    <p>Quiz UI (from your existing prototype) will be integrated here.</p>
+                </div>
+                
+                <!-- 5.5 Udemy Integration Tab -->
+                <div id="udemy-tab" class="tab-pane hidden card p-6">
+                    <h3 class="text-2xl font-bold text-red-400 mb-4">External Resources & Certification</h3>
+                    <p class="text-gray-300 mb-4">Get personalized recommendations for external courses and industry certifications based on this DSA concept.</p>
+                    <button class="btn-primary p-3 rounded-lg" onclick="searchExternalResources()">✨ Find Relevant Courses & Exams</button>
+                    <div id="udemy-results" class="mt-4 card p-4 bg-gray-800/50">
+                        <p class="text-gray-400">Results will appear here after search.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- 6. Profile Screen --- -->
+        <section id="profile-screen" class="hidden flex items-center justify-center">
+            <div class="card p-8 w-full max-w-lg">
+                <h2 class="text-3xl font-extrabold text-white mb-6">Coder Profile</h2>
+                <div class="space-y-4 text-lg">
+                    <p class="text-6xl text-center mb-4" id="profile-avatar">❓</p>
+                    <p><span class="font-bold text-purple-400">Username:</span> <span id="profile-username">Loading...</span></p>
+                    <p><span class="font-bold text-purple-400">Coder ID (UID):</span> <span id="profile-uid" class="text-sm">Loading...</span></p>
+                    <p><span class="font-bold text-purple-400">Total Score:</span> <span id="profile-score">0</span></p>
+                    <h3 class="text-xl font-bold mt-6 text-yellow-400">Achievements</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div class="p-3 card bg-green-900/40 rounded-lg">Stack Master</div>
+                        <div class="p-3 card bg-red-900/40 rounded-lg">Queue Novice</div>
+                        <div class="p-3 card bg-gray-600/40 rounded-lg opacity-50">Binary Beginner</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- --- 7. Leaderboard Screen --- -->
+        <section id="leaderboard-screen" class="hidden">
+            <h2 class="text-4xl font-bold mb-8 text-white">Global Leaderboard</h2>
+            <div class="card p-6 w-full max-w-4xl mx-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-purple-400 border-b border-gray-600">
+                            <th class="py-2">Rank</th>
+                            <th class="py-2">Coder</th>
+                            <th class="py-2">Score</th>
+                            <th class="py-2">Concepts Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <tr><td class="py-2">#1</td><td class="py-2">GeniusCoder</td><td class="py-2">1500</td><td class="py-2">DSA, CN</td></tr>
+                        <tr><td class="py-2">#2</td><td class="py-2">AlphaDev</td><td class="py-2">1200</td><td class="py-2">DSA</td></tr>
+                        <tr><td class="py-2">...</td><td class="py-2">...</td><td class="py-2">...</td><td class="py-2">...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        // The error originated here because navigateTo was undefined when this ran.
+        // It's safer to rely on the module's initialization function.
+        // However, we still need to ensure showConceptTab is globally accessible.
+
+        window.showConceptTab = (tabId) => {
+            document.querySelectorAll('.tab-pane').forEach(pane => { pane.classList.add('hidden'); });
+            document.querySelectorAll('.tab-button').forEach(button => { button.classList.remove('active'); });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`[onclick="showConceptTab('${tabId}')"]`).classList.add('active');
+        };
+        
+        // Removed original navigateTo('loading'); call here.
+        // The call is now inside the DOMContentLoaded listener within the module scope.
+    </script>
+</body>
+</html>
